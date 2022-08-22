@@ -3,7 +3,7 @@ import Head from 'next/head';
 import { trpc } from '../utils/trpc';
 import { useSession, signIn, signOut } from 'next-auth/react';
 import { Box, Button } from '@chakra-ui/react';
-import NavBar from './components/NavBar';
+import NavBar from '../components/NavBar';
 
 const Home: NextPage = () => {
   const { data, isLoading } = trpc.useQuery([
