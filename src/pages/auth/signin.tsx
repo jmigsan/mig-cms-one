@@ -27,8 +27,6 @@ const SignIn: React.FC<{
     return null;
   }
 
-  console.log(providers);
-
   return (
     <>
       <Box>
