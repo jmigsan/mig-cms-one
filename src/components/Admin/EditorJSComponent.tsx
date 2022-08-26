@@ -1,4 +1,3 @@
-import { Box } from '@chakra-ui/react';
 import EditorJS from '@editorjs/editorjs';
 import { useEffect } from 'react';
 
@@ -11,6 +10,6 @@ const EditorJSComponent = () => {
   //   console.log('yo');
   // }, []);
 
-  return <Box id='editorjs' />;
+  return <div id='editorjs' />;
 };
 export default EditorJSComponent;

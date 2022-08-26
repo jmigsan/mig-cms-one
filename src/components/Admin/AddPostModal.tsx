@@ -25,7 +25,14 @@ const AddPostModal = () => {
   const [publishDate, setPublishDate] = useState('');
   const [author, setAuthor] = useState('');
 
-  const DynamicEditorJS = dynamic(() => import('./EditorJSComponent'), {
+  let CustomEditor;
+
+  // const DynamicEditorJS = dynamic(() => import('./EditorJSComponent'), {
+  //   suspense: true,
+  //   ssr: false,
+  // });
+
+  CustomEditor = dynamic(() => import('./EditorJSComponent'), {
     suspense: true,
     ssr: false,
   });
@@ -55,8 +62,9 @@ const AddPostModal = () => {
             <Input onChange={(e) => setPublishDate(e.target.value)} />
             <Input onChange={(e) => setAuthor(e.target.value)} />
             <Suspense fallback={'Loading...'}>
-              <DynamicEditorJS />
+              {/* <DynamicEditorJS /> */}
               {/* <QuillNoSSRWrapper /> */}
+              {CustomEditor && <CustomEditor />}
             </Suspense>
             {/* <ReactEditorJS /> */}
             {/* <div id='editorjs' /> */}

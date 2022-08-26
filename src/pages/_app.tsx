@@ -47,9 +47,9 @@ export default withTRPC<AppRouter>({
       /**
        * @link https://react-query.tanstack.com/reference/QueryClient
        */
-      queryClientConfig: {
-        defaultOptions: { queries: { staleTime: Infinity } },
-      },
+      // queryClientConfig: {
+      //   defaultOptions: { queries: { staleTime: 1000 * 60 } },
+      // },
     };
   },
   /**
