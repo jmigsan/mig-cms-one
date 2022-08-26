@@ -13,6 +13,7 @@ import { useEffect } from 'react';
 import AddPostModal from '../AddPostModal';
 import Link from 'next/link';
 import UnauthorisedAdminPage from '../UnauthorisedAdminPage';
+import AddPostModalcopy from '../AddPostModalcopy';
 
 const Dashboard = () => {
   const utils = trpc.useContext();
@@ -46,7 +47,7 @@ const Dashboard = () => {
         <Box>
           <Text>Admin Dashboard</Text>
           <Box>
-            <AddPostModal />
+            <AddPostModalcopy />
           </Box>
         </Box>
       </>

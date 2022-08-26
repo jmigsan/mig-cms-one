@@ -13,8 +13,11 @@ import {
 } from '@chakra-ui/react';
 import { useState, Suspense } from 'react';
 import dynamic from 'next/dynamic';
-import { createReactEditorJS } from 'react-editor-js';
-import EditorJS from '@editorjs/editorjs';
+
+import { createEditor } from 'slate';
+import { Slate, Editable, withReact } from 'slate-react';
+import QuillComponent from './QuillComponent';
+// import SlateJS from './SlateJS';
 
 const AddPostModal = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -25,26 +28,10 @@ const AddPostModal = () => {
   const [publishDate, setPublishDate] = useState('');
   const [author, setAuthor] = useState('');
 
-  let CustomEditor;
-
-  const DynamicEditorJS = dynamic(() => import('./EditorJSComponent'), {
+  const DynamicEditorJS = dynamic(() => import('./QuillComponent'), {
     suspense: true,
     ssr: false,
   });
-
-  // CustomEditor = dynamic(() => import('./EditorJSComponent'), {
-  //   suspense: true,
-  //   ssr: false,
-  // });
-
-  // const QuillNoSSRWrapper = dynamic(import('react-quill'), {
-  //   ssr: false,
-  //   suspense: true,
-  // });
-
-  // const editor = new EditorJS();
-
-  // const ReactEditorJS = createReactEditorJS();
 
   return (
     <>
@@ -61,13 +48,10 @@ const AddPostModal = () => {
             <Input onChange={(e) => setContent(e.target.value)} />
             <Input onChange={(e) => setPublishDate(e.target.value)} />
             <Input onChange={(e) => setAuthor(e.target.value)} />
-            <Suspense fallback={'Loading...'}>
+            {/* <Suspense fallback={'Loading...'}>
               <DynamicEditorJS />
-              {/* <QuillNoSSRWrapper /> */}
-              {/* {CustomEditor && <CustomEditor />} */}
-            </Suspense>
-            {/* <ReactEditorJS /> */}
-            {/* <div id='editorjs' /> */}
+            </Suspense> */}
+            <QuillComponent />
           </ModalBody>
 
           <ModalFooter>
