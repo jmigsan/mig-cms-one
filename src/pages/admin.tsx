@@ -38,11 +38,11 @@ const Admin: NextPage = () => {
             <Box p={5} rounded={'lg'} bg={'green.200'}>
               <Stack>
                 <Text>Welcome to the Admin Panel</Text>
-                <Text>Role: {role.data}</Text>
+                {role.data && <Text>Role: {role.data}</Text>}
                 {!session && <Button onClick={() => signIn()}>Sign in</Button>}
                 {session && <Button onClick={() => signOut()}>Sign out</Button>}
                 {role.data === 'ADMIN' && (
-                  <Link href='/admin/panel'>
+                  <Link href='/admin/dashboard'>
                     <Button>Continue to admin panel</Button>
                   </Link>
                 )}

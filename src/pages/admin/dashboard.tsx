@@ -1,10 +1,11 @@
-import { Box } from '@chakra-ui/react';
+import { Box, Text } from '@chakra-ui/react';
 import Head from 'next/head';
 import { useSession } from 'next-auth/react';
 import { trpc } from '../../utils/trpc';
 import { useEffect } from 'react';
+import AddPostModal from '../../components/Admin/AddPostModal';
 
-const AdminPanel = () => {
+const AdminDashboard = () => {
   const utils = trpc.useContext();
   const role = trpc.useQuery(['user.getRole']);
 
@@ -18,13 +19,18 @@ const AdminPanel = () => {
     return (
       <>
         <Head>
-          <title>MigMS Admin Panel</title>
+          <title>MigMS Admin Dashboard</title>
           <meta name='description' content="Mig's CMS" />
           <link rel='icon' href='/favicon.ico' />
         </Head>
-        <Box>admin panel</Box>
+        <Box>
+          <Text>Admin Dashboard</Text>
+          <Box>
+            <AddPostModal />
+          </Box>
+        </Box>
       </>
     );
   }
 };
-export default AdminPanel;
+export default AdminDashboard;
