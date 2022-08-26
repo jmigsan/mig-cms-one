@@ -10,11 +10,12 @@ import {
   Button,
   Input,
   Box,
+  Stack,
 } from '@chakra-ui/react';
-import { useState, Suspense } from 'react';
-import dynamic from 'next/dynamic';
-import { createReactEditorJS } from 'react-editor-js';
-import EditorJS from '@editorjs/editorjs';
+import { useState } from 'react';
+
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 const AddPostModal = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -24,27 +25,6 @@ const AddPostModal = () => {
   const [content, setContent] = useState('');
   const [publishDate, setPublishDate] = useState('');
   const [author, setAuthor] = useState('');
-
-  let CustomEditor;
-
-  const DynamicEditorJS = dynamic(() => import('./EditorJSComponent'), {
-    suspense: true,
-    ssr: false,
-  });
-
-  // CustomEditor = dynamic(() => import('./EditorJSComponent'), {
-  //   suspense: true,
-  //   ssr: false,
-  // });
-
-  // const QuillNoSSRWrapper = dynamic(import('react-quill'), {
-  //   ssr: false,
-  //   suspense: true,
-  // });
-
-  // const editor = new EditorJS();
-
-  // const ReactEditorJS = createReactEditorJS();
 
   return (
     <>
@@ -56,18 +36,14 @@ const AddPostModal = () => {
           <ModalHeader>Add Post</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
-            <Input onChange={(e) => setTitle(e.target.value)} />
-            <Input onChange={(e) => setStatus(e.target.value)} />
-            <Input onChange={(e) => setContent(e.target.value)} />
-            <Input onChange={(e) => setPublishDate(e.target.value)} />
-            <Input onChange={(e) => setAuthor(e.target.value)} />
-            <Suspense fallback={'Loading...'}>
-              <DynamicEditorJS />
-              {/* <QuillNoSSRWrapper /> */}
-              {/* {CustomEditor && <CustomEditor />} */}
-            </Suspense>
-            {/* <ReactEditorJS /> */}
-            {/* <div id='editorjs' /> */}
+            <Stack spacing={2}>
+              <Input onChange={(e) => setTitle(e.target.value)} />
+              <Input onChange={(e) => setStatus(e.target.value)} />
+              <ReactQuill theme='snow' value={content} onChange={setContent} />
+              <div>{content}</div>
+              <Input onChange={(e) => setPublishDate(e.target.value)} />
+              <Input onChange={(e) => setAuthor(e.target.value)} />
+            </Stack>
           </ModalBody>
 
           <ModalFooter>

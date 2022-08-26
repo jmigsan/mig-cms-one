@@ -3,23 +3,19 @@ import {
   Center,
   Link as ChakraLink,
   Spinner,
-  Stack,
   Text,
 } from '@chakra-ui/react';
 import Head from 'next/head';
 import { useSession } from 'next-auth/react';
 import { trpc } from '../../../utils/trpc';
 import { useEffect } from 'react';
-import AddPostModal from '../AddPostModal';
-import Link from 'next/link';
 import UnauthorisedAdminPage from '../UnauthorisedAdminPage';
-import AddPostModalcopy from '../AddPostModalcopy';
+import AddPostModal from '../AddPostModal';
 
 const Dashboard = () => {
   const utils = trpc.useContext();
   const role = trpc.useQuery(['user.getRole'], {
-    // refetchOnWindowFocus: false,
-    //staleTime: Infinity, -- test if needed by turning above on
+    refetchOnWindowFocus: false,
   });
 
   const { data: session } = useSession();
@@ -47,7 +43,7 @@ const Dashboard = () => {
         <Box>
           <Text>Admin Dashboard</Text>
           <Box>
-            <AddPostModalcopy />
+            <AddPostModal />
           </Box>
         </Box>
       </>
