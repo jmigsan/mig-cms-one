@@ -14,6 +14,13 @@ import {
   FormLabel,
   Text,
   Switch,
+  Drawer,
+  DrawerOverlay,
+  DrawerContent,
+  DrawerCloseButton,
+  DrawerHeader,
+  DrawerBody,
+  DrawerFooter,
 } from '@chakra-ui/react';
 import { useState } from 'react';
 import { trpc } from '../../utils/trpc';
@@ -21,7 +28,7 @@ import { trpc } from '../../utils/trpc';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 
-const AddProductModal = () => {
+const AddProductDrawer = () => {
   const name = trpc.useQuery(['user.getName'], {
     refetchOnWindowFocus: false,
   });
@@ -55,14 +62,16 @@ const AddProductModal = () => {
 
   return (
     <>
-      <Button onClick={onOpen}>Add Product</Button>
+      <Button colorScheme='teal' onClick={onOpen}>
+        Add Product
+      </Button>
+      <Drawer isOpen={isOpen} placement='right' onClose={onClose}>
+        <DrawerOverlay />
+        <DrawerContent>
+          <DrawerCloseButton />
+          <DrawerHeader>Add Product</DrawerHeader>
 
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Add Product</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
+          <DrawerBody>
             <Stack spacing={2}>
               <FormLabel>Title</FormLabel>
               <Input onChange={(e) => setTitle(e.target.value)} />
@@ -91,20 +100,20 @@ const AddProductModal = () => {
                 onChange={(e) => setFile(e.target.files?.[0] || null)}
               />
             </Stack>
-          </ModalBody>
+          </DrawerBody>
 
-          <ModalFooter>
+          <DrawerFooter>
             <Button colorScheme='blue' mr={3} onClick={onClose}>
               Close
             </Button>
             <Button variant='ghost' onClick={() => saveProduct()}>
               Save Product
             </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
     </>
   );
 };
 
-export default AddProductModal;
+export default AddProductDrawer;

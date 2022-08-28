@@ -11,8 +11,8 @@ import { useSession } from 'next-auth/react';
 import { trpc } from '../../../utils/trpc';
 import { useEffect } from 'react';
 import UnauthorisedAdminPage from '../UnauthorisedAdminPage';
-import AddPostModal from '../AddPostModal';
-import AddProductModal from '../AddProductModal';
+import AddPostDrawer from '../AddPostDrawer';
+import AddProductDrawer from '../AddProductDrawer';
 
 const Dashboard = () => {
   const utils = trpc.useContext();
@@ -47,8 +47,8 @@ const Dashboard = () => {
             <Text>Admin Dashboard</Text>
             <Box>
               <HStack>
-                <AddPostModal />
-                <AddProductModal />
+                <AddPostDrawer />
+                <AddProductDrawer />
               </HStack>
             </Box>
           </Box>

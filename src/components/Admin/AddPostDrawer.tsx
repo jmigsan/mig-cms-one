@@ -14,19 +14,27 @@ import {
   FormLabel,
   Switch,
   Text,
+  Drawer,
+  DrawerOverlay,
+  DrawerCloseButton,
+  DrawerHeader,
+  DrawerBody,
+  DrawerContent,
+  DrawerFooter,
 } from '@chakra-ui/react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { trpc } from '../../utils/trpc';
 
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 
-const AddPostModal = () => {
+const AddPostDrawer = () => {
   const name = trpc.useQuery(['user.getName'], {
     refetchOnWindowFocus: false,
   });
 
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const btnRef = useRef();
 
   const [title, setTitle] = useState('');
   const [publish, setPublish] = useState(false);
@@ -53,14 +61,16 @@ const AddPostModal = () => {
 
   return (
     <>
-      <Button onClick={onOpen}>Add Post</Button>
+      <Button colorScheme='teal' onClick={onOpen}>
+        Open
+      </Button>
+      <Drawer isOpen={isOpen} placement='right' onClose={onClose}>
+        <DrawerOverlay />
+        <DrawerContent>
+          <DrawerCloseButton />
+          <DrawerHeader>Add Post</DrawerHeader>
 
-      <Modal isOpen={isOpen} onClose={onClose}>
-        <ModalOverlay />
-        <ModalContent>
-          <ModalHeader>Add Post</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody>
+          <DrawerBody>
             <Stack spacing={2}>
               <FormLabel>Title</FormLabel>
               <Input onChange={(e) => setTitle(e.target.value)} />
@@ -85,20 +95,20 @@ const AddPostModal = () => {
                 defaultValue={name.data || ''}
               />
             </Stack>
-          </ModalBody>
+          </DrawerBody>
 
-          <ModalFooter>
+          <DrawerFooter>
             <Button colorScheme='blue' mr={3} onClick={onClose}>
               Close
             </Button>
             <Button variant='ghost' onClick={() => savePost()}>
               Save Post
             </Button>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
+          </DrawerFooter>
+        </DrawerContent>
+      </Drawer>
     </>
   );
 };
 
-export default AddPostModal;
+export default AddPostDrawer;
