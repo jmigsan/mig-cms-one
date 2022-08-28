@@ -12,8 +12,8 @@ import {
   Box,
   Stack,
   FormLabel,
-  Switch,
   Text,
+  Switch,
 } from '@chakra-ui/react';
 import { useState } from 'react';
 import { trpc } from '../../utils/trpc';
@@ -21,7 +21,7 @@ import { trpc } from '../../utils/trpc';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 
-const AddPostModal = () => {
+const AddProductModal = () => {
   const name = trpc.useQuery(['user.getName'], {
     refetchOnWindowFocus: false,
   });
@@ -34,9 +34,11 @@ const AddPostModal = () => {
   const [publishDate, setPublishDate] = useState('');
   const [author, setAuthor] = useState('');
 
-  const createPostMutation = trpc.useMutation(['post.uploadPost']);
+  const [file, setFile] = useState<any>();
 
-  const savePost = async () => {
+  const createPostMutation = trpc.useMutation(['product.uploadProduct']);
+
+  const saveProduct = async () => {
     const datePublishDate = new Date(publishDate);
 
     console.log(datePublishDate);
@@ -53,12 +55,12 @@ const AddPostModal = () => {
 
   return (
     <>
-      <Button onClick={onOpen}>Add Post</Button>
+      <Button onClick={onOpen}>Add Product</Button>
 
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
         <ModalContent>
-          <ModalHeader>Add Post</ModalHeader>
+          <ModalHeader>Add Product</ModalHeader>
           <ModalCloseButton />
           <ModalBody>
             <Stack spacing={2}>
@@ -84,6 +86,10 @@ const AddPostModal = () => {
                 onChange={(e) => setAuthor(e.target.value)}
                 defaultValue={name.data || ''}
               />
+              <Input
+                type={'file'}
+                onChange={(e) => setFile(e.target.files?.[0] || null)}
+              />
             </Stack>
           </ModalBody>
 
@@ -91,8 +97,8 @@ const AddPostModal = () => {
             <Button colorScheme='blue' mr={3} onClick={onClose}>
               Close
             </Button>
-            <Button variant='ghost' onClick={() => savePost()}>
-              Save Post
+            <Button variant='ghost' onClick={() => saveProduct()}>
+              Save Product
             </Button>
           </ModalFooter>
         </ModalContent>
@@ -101,4 +107,4 @@ const AddPostModal = () => {
   );
 };
 
-export default AddPostModal;
+export default AddProductModal;

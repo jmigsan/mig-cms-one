@@ -1,6 +1,7 @@
 import {
   Box,
   Center,
+  HStack,
   Link as ChakraLink,
   Spinner,
   Text,
@@ -11,6 +12,7 @@ import { trpc } from '../../../utils/trpc';
 import { useEffect } from 'react';
 import UnauthorisedAdminPage from '../UnauthorisedAdminPage';
 import AddPostModal from '../AddPostModal';
+import AddProductModal from '../AddProductModal';
 
 const Dashboard = () => {
   const utils = trpc.useContext();
@@ -41,9 +43,14 @@ const Dashboard = () => {
           <link rel='icon' href='/favicon.ico' />
         </Head>
         <Box>
-          <Text>Admin Dashboard</Text>
-          <Box>
-            <AddPostModal />
+          <Box p={4}>
+            <Text>Admin Dashboard</Text>
+            <Box>
+              <HStack>
+                <AddPostModal />
+                <AddProductModal />
+              </HStack>
+            </Box>
           </Box>
         </Box>
       </>
