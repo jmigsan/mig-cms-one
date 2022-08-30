@@ -15,6 +15,7 @@ const b2 = new S3({
 // Example router with queries that can only be hit if the user requesting is signed in
 export const b2Router = createProtectedRouter().query('uploadImage', {
   async resolve({ ctx }) {
+    const signedUrl = s3.getSignedUrl('getObject', {
       Key: key,
       Bucket: bucket,
       Expires: expires || 900, // S3 default is 900 seconds (15 minutes)
