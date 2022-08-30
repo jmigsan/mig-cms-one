@@ -97,7 +97,6 @@ const AddProductDrawer = () => {
           >
             Toggle Fullscreen
           </Button>
-          {/* <DrawerCloseButton /> */}
           <DrawerHeader>Add Product</DrawerHeader>
 
           <DrawerBody>
