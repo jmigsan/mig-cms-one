@@ -10,7 +10,6 @@ import {
   Drawer,
   DrawerOverlay,
   DrawerContent,
-  DrawerCloseButton,
   DrawerHeader,
   DrawerBody,
   DrawerFooter,
@@ -21,7 +20,6 @@ import { trpc } from '../../utils/trpc';
 
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import axios from 'axios';
 
 const AddProductDrawer = () => {
   const name = trpc.useQuery(['user.getName'], {
@@ -87,7 +85,6 @@ const AddProductDrawer = () => {
       await fetch(signedPost!.presignedurl.url, {
         method: 'POST',
         body: formData,
-        mode: 'no-cors',
       });
     } catch (err) {
       console.log(err);
