@@ -1,11 +1,4 @@
 import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
   useDisclosure,
   Button,
   Input,
@@ -28,6 +21,7 @@ import { trpc } from '../../utils/trpc';
 
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+import axios from 'axios';
 
 const AddProductDrawer = () => {
   const name = trpc.useQuery(['user.getName'], {
@@ -43,8 +37,7 @@ const AddProductDrawer = () => {
   const [publishDate, setPublishDate] = useState('');
   const [author, setAuthor] = useState('');
 
-  const [file, setFile] = useState<any>();
-
+  // uploading to postgres
   const createPostMutation = trpc.useMutation(['product.uploadProduct']);
 
   const saveProduct = async () => {
@@ -72,6 +65,33 @@ const AddProductDrawer = () => {
 
   const toggleFullscreen = () => {
     setFullscreen(!fullscreen);
+  };
+
+  // uploading to s3
+  const getSignedPost = trpc.useMutation(['b2.createPresignedPost']);
+
+  const [file, setFile] = useState<any>();
+
+  const uploadFile = async () => {
+    const signedPost = await getSignedPost.mutateAsync();
+    console.log(signedPost);
+
+    try {
+      const formData = new FormData();
+      formData.append('Content-Type', file.type);
+      Object.entries(signedPost!.presignedurl.fields).forEach(([k, v]) => {
+        formData.append(k, v);
+      });
+      formData.append('file', file); // must be the last one
+
+      await fetch(signedPost!.presignedurl.url, {
+        method: 'POST',
+        body: formData,
+        mode: 'no-cors',
+      });
+    } catch (err) {
+      console.log(err);
+    }
   };
 
   return (
@@ -116,6 +136,8 @@ const AddProductDrawer = () => {
                   onChange={(e) => setFile(e.target.files?.[0] || null)}
                   variant={'unstyled'}
                 />
+                <Button onClick={() => uploadFile()}>yo</Button>
+
                 <FormLabel>Content</FormLabel>
                 <ReactQuill
                   theme='snow'

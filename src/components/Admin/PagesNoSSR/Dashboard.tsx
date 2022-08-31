@@ -16,9 +16,7 @@ import AddProductDrawer from '../AddProductDrawer';
 
 const Dashboard = () => {
   const utils = trpc.useContext();
-  const role = trpc.useQuery(['user.getRole'], {
-    refetchOnWindowFocus: false,
-  });
+  const role = trpc.useQuery(['user.getRole']);
 
   const { data: session } = useSession();
 
