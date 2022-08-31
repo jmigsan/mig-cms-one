@@ -10,7 +10,7 @@ import Head from 'next/head';
 import { useSession } from 'next-auth/react';
 import { trpc } from '../../../utils/trpc';
 import { useEffect } from 'react';
-import UnauthorisedAdminPage from '../UnauthorisedAdminPage';
+import UnauthorisedAdminPage from './UnauthorisedAdminPage';
 import AddPostDrawer from '../AddPostDrawer';
 import AddProductDrawer from '../AddProductDrawer';
 
