@@ -15,7 +15,8 @@ export const serverSchema = z.object({
   BB_BUCKET_NAME: z.string(),
   BB_ACCESS_KEY: z.string(),
   BB_SECRET_KEY: z.string(),
-  // BB_ENDPOINT: z.string(),
+  BB_REGION: z.string(),
+  BB_ENDPOINT: z.string(),
 });
 
 /**

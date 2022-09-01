@@ -24,6 +24,10 @@ const Dashboard = () => {
     utils.invalidateQueries(['user.getRole']);
   }, [session]);
 
+  if (!session) {
+    return <UnauthorisedAdminPage />;
+  }
+
   if (!role.data) {
     return (
       <Center pt={6}>
@@ -32,7 +36,7 @@ const Dashboard = () => {
     );
   }
 
-  if (role.data === 'ADMIN' && session) {
+  if (role.data === 'ADMIN') {
     return (
       <>
         <Head>

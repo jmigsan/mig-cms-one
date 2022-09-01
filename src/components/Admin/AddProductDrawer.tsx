@@ -26,9 +26,10 @@ const AddProductDrawer = () => {
     refetchOnWindowFocus: false,
   });
 
+  //if drawer open or not
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [fullscreen, setFullscreen] = useState(false);
 
+  // store post data
   const [title, setTitle] = useState('');
   const [publish, setPublish] = useState(false);
   const [content, setContent] = useState('');
@@ -61,34 +62,41 @@ const AddProductDrawer = () => {
     });
   };
 
+  // fullscreen toggle
+  const [fullscreen, setFullscreen] = useState(false);
+
   const toggleFullscreen = () => {
     setFullscreen(!fullscreen);
   };
 
   // uploading to s3
   const getSignedPost = trpc.useMutation(['b2.createPresignedPost']);
+  const b2Test = trpc.useMutation(['b2.b2Test']);
 
   const [file, setFile] = useState<any>();
 
   const uploadFile = async () => {
-    const signedPost = await getSignedPost.mutateAsync();
-    console.log(signedPost);
+    // const signedPost = await getSignedPost.mutateAsync();
+    // console.log(signedPost);
 
-    try {
-      const formData = new FormData();
-      formData.append('Content-Type', file.type);
-      Object.entries(signedPost!.presignedurl.fields).forEach(([k, v]) => {
-        formData.append(k, v);
-      });
-      formData.append('file', file); // must be the last one
+    // try {
+    //   const formData = new FormData();
+    //   formData.append('Content-Type', file.type);
+    //   Object.entries(signedPost!.preSignedUrl.fields).forEach(([k, v]) => {
+    //     formData.append(k, v);
+    //   });
+    //   formData.append('file', file); // must be the last one
 
-      await fetch(signedPost!.presignedurl.url, {
-        method: 'POST',
-        body: formData,
-      });
-    } catch (err) {
-      console.log(err);
-    }
+    //   await fetch(signedPost!.preSignedUrl.url, {
+    //     method: 'POST',
+    //     body: formData,
+    //   });
+    // } catch (err) {
+    //   console.log(err);
+    // }
+
+    const eh = await b2Test.mutateAsync({ file: file });
+    console.log(eh);
   };
 
   return (
