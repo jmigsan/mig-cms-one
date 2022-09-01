@@ -40,13 +40,13 @@ const Admin: NextPage = () => {
                 <Text>Welcome to the Admin Panel</Text>
                 {role.data && <Text>Role: {role.data}</Text>}
                 {session && !role.data && <Text>Loading...</Text>}
-                {!session && <Button onClick={() => signIn()}>Sign in</Button>}
-                {session && <Button onClick={() => signOut()}>Sign out</Button>}
                 {role.data === 'ADMIN' && (
                   <Link href='/admin/dashboard'>
                     <Button>Continue to admin panel</Button>
                   </Link>
                 )}
+                {!session && <Button onClick={() => signIn()}>Sign in</Button>}
+                {session && <Button onClick={() => signOut()}>Sign out</Button>}
               </Stack>
             </Box>
             <Link href='/'>
