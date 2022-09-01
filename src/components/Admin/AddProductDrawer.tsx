@@ -14,12 +14,14 @@ import {
   DrawerBody,
   DrawerFooter,
   Container,
+  FormControl,
 } from '@chakra-ui/react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { trpc } from '../../utils/trpc';
 
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+import axios from 'axios';
 
 const AddProductDrawer = () => {
   const name = trpc.useQuery(['user.getName'], {
@@ -70,33 +72,34 @@ const AddProductDrawer = () => {
   };
 
   // uploading to s3
-  const getSignedPost = trpc.useMutation(['b2.createPresignedPost']);
-  const b2Test = trpc.useMutation(['b2.b2Test']);
+  const getSignedPut = trpc.useMutation(['b2.getSignedPut']);
 
-  const [file, setFile] = useState<any>();
+  const [file, setFile] = useState<File>();
 
   const uploadFile = async () => {
-    // const signedPost = await getSignedPost.mutateAsync();
-    // console.log(signedPost);
+    if (!file) {
+      return null;
+    }
 
-    // try {
-    //   const formData = new FormData();
-    //   formData.append('Content-Type', file.type);
-    //   Object.entries(signedPost!.preSignedUrl.fields).forEach(([k, v]) => {
-    //     formData.append(k, v);
-    //   });
-    //   formData.append('file', file); // must be the last one
+    const fileType = encodeURIComponent(file.type);
+    console.log(fileType);
 
-    //   await fetch(signedPost!.preSignedUrl.url, {
-    //     method: 'POST',
-    //     body: formData,
-    //   });
-    // } catch (err) {
-    //   console.log(err);
-    // }
+    const signedUrl = await getSignedPut.mutateAsync({ fileType: fileType });
+    console.log(signedUrl);
 
-    const eh = await b2Test.mutateAsync({ file: file });
-    console.log(eh);
+    await axios.put(signedUrl.uploadUrl, file);
+
+    return signedUrl.key;
+  };
+
+  // reset file
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const resetFile = () => {
+    if (inputRef.current !== null) {
+      setFile(undefined);
+      inputRef.current.value = '';
+    }
   };
 
   return (
@@ -127,40 +130,45 @@ const AddProductDrawer = () => {
           <DrawerBody>
             <Container maxW={'2xl'}>
               <Stack spacing={2}>
-                <FormLabel>Title</FormLabel>
-                <Input onChange={(e) => setTitle(e.target.value)} />
-                <FormLabel>Publish</FormLabel>
-                <Switch
-                  isChecked={publish}
-                  onChange={(e) => setPublish(e.target.checked)}
-                />
-                {publish && <div>yo</div>}
-                <FormLabel>Image</FormLabel>
-                <Input
-                  type={'file'}
-                  onChange={(e) => setFile(e.target.files?.[0] || null)}
-                  variant={'unstyled'}
-                />
-                <Button onClick={() => uploadFile()}>yo</Button>
+                <FormControl>
+                  <FormLabel>Title</FormLabel>
+                  <Input onChange={(e) => setTitle(e.target.value)} />
+                  <FormLabel>Publish</FormLabel>
+                  <Switch
+                    isChecked={publish}
+                    onChange={(e) => setPublish(e.target.checked)}
+                  />
+                  {publish && <div>yo</div>}
+                  <FormLabel>Image</FormLabel>
+                  <Input
+                    type={'file'}
+                    accept={'image/jpeg image/png'}
+                    ref={inputRef}
+                    onChange={(e) => setFile(e.target.files?.[0] || undefined)}
+                    variant={'unstyled'}
+                  />
+                  <Button onClick={() => uploadFile()}>yo</Button>
+                  <Button onClick={() => resetFile()}>oi</Button>
 
-                <FormLabel>Content</FormLabel>
-                <ReactQuill
-                  theme='snow'
-                  value={content}
-                  onChange={setContent}
-                />
-                <div>{content}</div>
-                <FormLabel>Date</FormLabel>
-                <Input
-                  type={'date'}
-                  onChange={(e) => setPublishDate(e.target.value)}
-                />
-                <Text>{publishDate}</Text>
-                <FormLabel>Author</FormLabel>
-                <Input
-                  onChange={(e) => setAuthor(e.target.value)}
-                  defaultValue={name.data || ''}
-                />
+                  <FormLabel>Content</FormLabel>
+                  <ReactQuill
+                    theme='snow'
+                    value={content}
+                    onChange={setContent}
+                  />
+                  <div>{content}</div>
+                  <FormLabel>Date</FormLabel>
+                  <Input
+                    type={'date'}
+                    onChange={(e) => setPublishDate(e.target.value)}
+                  />
+                  <Text>{publishDate}</Text>
+                  <FormLabel>Author</FormLabel>
+                  <Input
+                    onChange={(e) => setAuthor(e.target.value)}
+                    defaultValue={name.data || ''}
+                  />
+                </FormControl>
               </Stack>
             </Container>
           </DrawerBody>

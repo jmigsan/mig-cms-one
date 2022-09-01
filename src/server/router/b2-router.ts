@@ -3,11 +3,13 @@ import { z } from 'zod';
 
 import { nanoid } from '../libs/nanoid';
 import { b2 } from '../libs/b2';
-import AWS from 'aws-sdk';
 
 export const b2Router = createProtectedRouter()
-  .mutation('createPresignedPost', {
-    async resolve({ ctx }) {
+  .mutation('getSignedPut', {
+    input: z.object({
+      fileType: z.string(),
+    }),
+    async resolve({ ctx, input }) {
       if (!ctx.session.user.id) {
         throw new Error('please sign in');
       }
@@ -22,48 +24,40 @@ export const b2Router = createProtectedRouter()
       }
 
       const fileId = nanoid();
+      const fileExtension = input.fileType.split('%2F')[1];
+      const key = `${fileId}.${fileExtension}`;
 
-      const signedUrl = b2.getSignedUrl('putObject', {
+      const b2Params = {
         Bucket: process.env.BB_BUCKET_NAME,
-        Key: fileId,
-        Expires: 300,
-        ContentType: 'image/jpeg',
-      });
+        Key: key,
+        Expires: 60,
+        ContentType: `image/${fileExtension}`,
+      };
 
-      // const signedUrl = b2.createPresignedPost({
-      //   Bucket: 'mig-cms-one',
-      //   Fields: {
-      //     key: fileId,
-      //   },
-      //   Conditions: [
-      //     ['content-length-range', 0, 67108864], // content length restrictions: 0-64MB
-      //     ['starts-with', '$Content-Type', 'image/'], // content type restriction
-      //     // ['eq', '$x-amz-meta-userid', ctx.session.user.id], // tag with userid <- the user can see this!
-      //   ],
-      // });
+      const uploadUrl = await b2.getSignedUrl('putObject', b2Params);
 
-      // // signedUrl.fields['x-amz-meta-userid'] = ctx.session.user.id; // Don't forget to add this field too
-
-      console.log(fileId, signedUrl);
-
-      return { fileName: fileId, preSignedUrl: signedUrl };
+      return { key, uploadUrl };
     },
   })
-  .mutation('uploadToB2', {
-    async resolve({ ctx }) {},
-  })
-  .mutation('b2Test', {
+  .mutation('b2Tom', {
     input: z.object({
-      file: z.record(z.any()),
+      fileType: z.string(),
     }),
     async resolve({ ctx, input }) {
-      var upload = new AWS.S3.ManagedUpload({
-        params: {
-          Bucket: process.env.BB_BUCKET_NAME!,
-          Key: nanoid(),
-          Body: input.file,
-        },
-      });
-      return upload;
+      const fileExtension = input.fileType.split('%2F')[1];
+
+      const fileId = nanoid();
+      const key = `${fileId}.${fileExtension}`;
+
+      const b2Params = {
+        Bucket: process.env.BB_BUCKET_NAME,
+        Key: key,
+        Expires: 60,
+        ContentType: `image/${fileExtension}`,
+      };
+
+      const uploadUrl = await b2.getSignedUrl('putObject', b2Params);
+
+      return { key, uploadUrl };
     },
   });
