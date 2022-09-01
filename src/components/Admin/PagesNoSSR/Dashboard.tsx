@@ -17,6 +17,10 @@ import AddProductDrawer from '../AddProductDrawer';
 const Dashboard = () => {
   const utils = trpc.useContext();
   const role = trpc.useQuery(['user.getRole']);
+  const img = trpc.useQuery([
+    'b2.getSignedGet',
+    { fileKey: 'bvycw2zdjqv08n.jpeg' },
+  ]);
 
   const { data: session } = useSession();
 
@@ -52,6 +56,8 @@ const Dashboard = () => {
                 <AddPostDrawer />
                 <AddProductDrawer />
               </HStack>
+              <img src={img.data?.uploadUrl} alt={'oi'} />
+              <button onClick={() => console.log(img.data)}>yo</button>
             </Box>
           </Box>
         </Box>

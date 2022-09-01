@@ -39,24 +39,20 @@ export const b2Router = createProtectedRouter()
       return { key, uploadUrl };
     },
   })
-  .mutation('b2Tom', {
+  .query('getSignedGet', {
     input: z.object({
-      fileType: z.string(),
+      fileKey: z.string(),
     }),
     async resolve({ ctx, input }) {
-      const fileExtension = input.fileType.split('%2F')[1];
-
-      const fileId = nanoid();
-      const key = `${fileId}.${fileExtension}`;
+      const key = input.fileKey;
 
       const b2Params = {
         Bucket: process.env.BB_BUCKET_NAME,
         Key: key,
         Expires: 60,
-        ContentType: `image/${fileExtension}`,
       };
 
-      const uploadUrl = await b2.getSignedUrl('putObject', b2Params);
+      const uploadUrl = await b2.getSignedUrl('getObject', b2Params);
 
       return { key, uploadUrl };
     },
