@@ -56,8 +56,8 @@ const Dashboard = () => {
                 <AddPostDrawer />
                 <AddProductDrawer />
               </HStack>
-              <img src={img.data?.uploadUrl} alt={'oi'} />
-              <button onClick={() => console.log(img.data)}>yo</button>
+              {/* <img src={img.data?.uploadUrl} alt={'oi'} /> */}
+              {/* <button onClick={() => console.log(img.data)}>yo</button> */}
             </Box>
           </Box>
         </Box>
