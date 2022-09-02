@@ -14,6 +14,14 @@ import UnauthorisedAdminPage from './UnauthorisedAdminPage';
 import AddPostDrawer from '../AddPostDrawer';
 import AddProductDrawer from '../AddProductDrawer';
 
+// import dynamic from 'next/dynamic';
+
+// const TipTap = dynamic(() => import('../TipTap'), {
+//   ssr: false,
+// });
+
+// import TipTap from '../TipTap';
+
 const Dashboard = () => {
   const utils = trpc.useContext();
   const role = trpc.useQuery(['user.getRole']);

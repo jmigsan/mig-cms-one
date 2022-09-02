@@ -15,13 +15,12 @@ import {
   DrawerFooter,
   Container,
   FormControl,
+  HStack,
 } from '@chakra-ui/react';
 import { useRef, useState } from 'react';
 import { trpc } from '../../utils/trpc';
-
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
 import axios from 'axios';
+import TipTap from './TipTap';
 
 const AddProductDrawer = () => {
   const name = trpc.useQuery(['user.getName'], {
@@ -49,7 +48,7 @@ const AddProductDrawer = () => {
 
     let screenedContent = '';
 
-    if (content === '<p><br></p>') {
+    if (content === '<p></p>') {
       screenedContent = '';
     } else {
       screenedContent = content;
@@ -128,35 +127,36 @@ const AddProductDrawer = () => {
           <DrawerHeader>Add Product</DrawerHeader>
 
           <DrawerBody>
-            <Container maxW={'2xl'}>
-              <Stack spacing={2}>
-                <FormControl>
+            <Container maxW={'3xl'}>
+              <FormControl>
+                <Stack spacing={2}>
                   <FormLabel>Title</FormLabel>
                   <Input onChange={(e) => setTitle(e.target.value)} />
                   <FormLabel>Publish</FormLabel>
-                  <Switch
-                    isChecked={publish}
-                    onChange={(e) => setPublish(e.target.checked)}
-                  />
-                  {publish && <div>yo</div>}
+                  <HStack>
+                    <Switch
+                      isChecked={publish}
+                      onChange={(e) => setPublish(e.target.checked)}
+                    />
+                    {publish ? <Text>Publish</Text> : <Text>Draft</Text>}
+                  </HStack>
                   <FormLabel>Image</FormLabel>
                   <Input
                     type={'file'}
-                    accept={'image/jpeg image/png'}
+                    accept={'image/jpeg, image/png'}
                     ref={inputRef}
                     onChange={(e) => setFile(e.target.files?.[0] || undefined)}
                     variant={'unstyled'}
                   />
-                  <Button onClick={() => uploadFile()}>yo</Button>
-                  <Button onClick={() => resetFile()}>oi</Button>
+                  <HStack>
+                    <Button onClick={() => uploadFile()}>Upload File</Button>
+                    <Button onClick={() => resetFile()}>Reset File</Button>
+                  </HStack>
 
                   <FormLabel>Content</FormLabel>
-                  <ReactQuill
-                    theme='snow'
-                    value={content}
-                    onChange={setContent}
-                  />
-                  <div>{content}</div>
+
+                  <TipTap setContent={setContent} />
+
                   <FormLabel>Date</FormLabel>
                   <Input
                     type={'date'}
@@ -168,8 +168,8 @@ const AddProductDrawer = () => {
                     onChange={(e) => setAuthor(e.target.value)}
                     defaultValue={name.data || ''}
                   />
-                </FormControl>
-              </Stack>
+                </Stack>
+              </FormControl>
             </Container>
           </DrawerBody>
 
