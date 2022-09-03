@@ -13,6 +13,11 @@ export const postRouter = createProtectedRouter()
       return 'He who asks a question is a fool for five minutes; he who does not ask a question remains a fool forever.';
     },
   })
+  .query('getPosts', {
+    async resolve({ ctx }) {
+      return await ctx.prisma.post.findMany();
+    },
+  })
   .mutation('uploadPost', {
     input: z
       .object({
