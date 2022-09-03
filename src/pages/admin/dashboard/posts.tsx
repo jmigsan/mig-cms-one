@@ -6,6 +6,7 @@ import Link from 'next/link';
 import UnauthorisedAdminPage from '../../../components/Admin/PagesNoSSR/UnauthorisedAdminPage';
 import { trpc } from '../../../utils/trpc';
 import { useSession } from 'next-auth/react';
+import AdminNavBar from '../../../components/Admin/AdminNavBar';
 
 const posts = () => {
   // page auth begin
@@ -37,9 +38,12 @@ const posts = () => {
         <link rel='icon' href='/favicon.ico' />
       </Head>
       <Box>
-        <Link href={'/admin/dashboard/posts/create'}>
-          <Button>Create post</Button>
-        </Link>
+        <AdminNavBar />
+        <Box p={3}>
+          <Link href={'/admin/dashboard/posts/create'}>
+            <Button>Create post</Button>
+          </Link>
+        </Box>
       </Box>
     </>
   );

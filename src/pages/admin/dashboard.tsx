@@ -14,6 +14,7 @@ import { useSession } from 'next-auth/react';
 import { trpc } from '../../utils/trpc';
 import UnauthorisedAdminPage from '../../components/Admin/PagesNoSSR/UnauthorisedAdminPage';
 import Link from 'next/link';
+import AdminNavBar from '../../components/Admin/AdminNavBar';
 
 const Dashboard = () => {
   const img = trpc.useQuery([
@@ -50,17 +51,10 @@ const Dashboard = () => {
         <link rel='icon' href='/favicon.ico' />
       </Head>
       <Box>
-        <Box p={4}>
+        <AdminNavBar />
+        <Box p={3}>
           <Text>Admin Dashboard</Text>
           <Box>
-            <HStack>
-              <Link href={'/admin/dashboard/posts'}>
-                <Button>Posts</Button>
-              </Link>
-              <Link href={'/admin/dashboard/products'}>
-                <Button>Products</Button>
-              </Link>
-            </HStack>
             {/* <img src={img.data?.uploadUrl} alt={'oi'} /> */}
             {/* <button onClick={() => console.log(img.data)}>yo</button> */}
           </Box>
