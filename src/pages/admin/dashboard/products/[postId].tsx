@@ -31,7 +31,7 @@ const EditPost = (
   const router = useRouter();
   // const postId = router.query.postId as string;
   console.log(props.postId);
-  const post = trpc.useQuery(['post.getPost', { postId: props.postId }]);
+  const post = trpc.useQuery(['product.getProducts', { postId: props.postId }]);
   // console.log(post.data);
 
   // if (!post.data?.content) {
