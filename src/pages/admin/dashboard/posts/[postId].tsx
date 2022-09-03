@@ -1,32 +1,45 @@
 import dynamic from 'next/dynamic';
 
 import {
-  Button,
-  Input,
-  Stack,
-  FormLabel,
+  Box,
+  Center,
+  Spinner,
+  useToast,
   Text,
-  Switch,
   Container,
   FormControl,
+  Stack,
+  FormLabel,
+  Input,
   HStack,
-  Center,
-  useToast,
-  Spinner,
-  Box,
+  Switch,
+  Link,
+  Button,
 } from '@chakra-ui/react';
-import { useRef, useState } from 'react';
-import { trpc } from '../../../../utils/trpc';
-import TipTap from '../../../../components/Admin/TipTap';
-import axios from 'axios';
-import Link from 'next/link';
-import { useRouter } from 'next/router';
-import UnauthorisedAdminPage from '../../../../components/Admin/PagesNoSSR/UnauthorisedAdminPage';
 import { useSession } from 'next-auth/react';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
 import AdminNavBar from '../../../../components/Admin/AdminNavBar';
+import UnauthorisedAdminPage from '../../../../components/Admin/PagesNoSSR/UnauthorisedAdminPage';
+import TipTap from '../../../../components/Admin/TipTap';
+import { trpc } from '../../../../utils/trpc';
 
-const AddProduct = () => {
+const EditPost = () => {
+  const router = useRouter();
+  const { postId } = router.query;
+  console.log(postId);
+  const post = trpc.useQuery(['post.getPost', { postId }]);
+  console.log(post.data);
+
+  if (!post.data?.content) {
+    return (
+      <Center pt={6}>
+        <Spinner />
+      </Center>
+    );
+  }
+
   const name = trpc.useQuery(['user.getName'], {
     refetchOnWindowFocus: false,
   });
@@ -39,11 +52,11 @@ const AddProduct = () => {
   const [author, setAuthor] = useState('');
 
   // upload to postgres
-  const createProductMutation = trpc.useMutation(['product.uploadProduct']);
-  const router = useRouter();
+  const createPostMutation = trpc.useMutation(['post.uploadPost']);
+  // const router = useRouter();
   const toast = useToast();
 
-  const saveProduct = async () => {
+  const savePost = async () => {
     try {
       const datePublishDate = new Date(publishDate);
 
@@ -55,7 +68,7 @@ const AddProduct = () => {
         screenedContent = content;
       }
 
-      createProductMutation.mutate({
+      createPostMutation.mutate({
         title,
         published: publish,
         content: screenedContent,
@@ -63,11 +76,11 @@ const AddProduct = () => {
         author,
       });
 
-      router.push('/admin/dashboard/products');
+      router.push('/admin/dashboard/posts');
 
       toast({
-        title: 'Product created',
-        description: 'Successfully created a product',
+        title: 'Post created',
+        description: 'Successfully created a post',
         status: 'success',
         duration: 7500,
         isClosable: true,
@@ -75,42 +88,11 @@ const AddProduct = () => {
     } catch (err) {
       console.log(err);
       toast({
-        title: 'Product creation failed',
+        title: 'Post failed',
         status: 'error',
         duration: 7500,
         isClosable: true,
       });
-    }
-  };
-
-  // upload to s3
-  const getSignedPut = trpc.useMutation(['b2.getSignedPut']);
-
-  const [file, setFile] = useState<File>();
-
-  const uploadFile = async () => {
-    if (!file) {
-      return null;
-    }
-
-    const fileType = encodeURIComponent(file.type);
-    console.log(fileType);
-
-    const signedUrl = await getSignedPut.mutateAsync({ fileType: fileType });
-    console.log(signedUrl);
-
-    await axios.put(signedUrl.uploadUrl, file);
-
-    return signedUrl.key;
-  };
-
-  // reset file
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  const resetFile = () => {
-    if (inputRef.current !== null) {
-      setFile(undefined);
-      inputRef.current.value = '';
     }
   };
 
@@ -145,8 +127,9 @@ const AddProduct = () => {
       <Box>
         <AdminNavBar />
         <Center p={6}>
-          <Text fontSize={'2xl'}>Add Product</Text>
+          <Text fontSize={'2xl'}>Add Post</Text>
         </Center>
+
         <Container maxW={'3xl'}>
           <FormControl>
             <Stack spacing={2}>
@@ -160,22 +143,10 @@ const AddProduct = () => {
                 />
                 <Text>{publish ? 'Publish' : 'Draft'}</Text>
               </HStack>
-              <FormLabel>Image</FormLabel>
-              <Input
-                type={'file'}
-                accept={'image/jpeg, image/png'}
-                ref={inputRef}
-                onChange={(e) => setFile(e.target.files?.[0] || undefined)}
-                variant={'unstyled'}
-              />
-              <HStack>
-                <Button onClick={() => uploadFile()}>Upload File</Button>
-                <Button onClick={() => resetFile()}>Reset File</Button>
-              </HStack>
 
               <FormLabel>Content</FormLabel>
 
-              <TipTap setContent={setContent} content='' />
+              <TipTap setContent={setContent} content={post.data?.content!} />
 
               <FormLabel>Date</FormLabel>
               <Input
@@ -197,8 +168,8 @@ const AddProduct = () => {
               <Button>Back</Button>
             </Link>
 
-            <Button variant='ghost' onClick={() => saveProduct()}>
-              Save Product
+            <Button variant='ghost' onClick={() => savePost()}>
+              Save Post
             </Button>
           </HStack>
         </Center>
@@ -207,6 +178,6 @@ const AddProduct = () => {
   );
 };
 
-export default dynamic(() => Promise.resolve(AddProduct), {
+export default dynamic(() => Promise.resolve(EditPost), {
   ssr: false,
 });

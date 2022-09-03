@@ -1,6 +1,6 @@
 import dynamic from 'next/dynamic';
 
-import { Box, Button, Center, Spinner } from '@chakra-ui/react';
+import { Box, Button, Center, Spinner, Stack } from '@chakra-ui/react';
 import Head from 'next/head';
 import Link from 'next/link';
 import UnauthorisedAdminPage from '../../../components/Admin/PagesNoSSR/UnauthorisedAdminPage';
@@ -9,6 +9,9 @@ import { useSession } from 'next-auth/react';
 import AdminNavBar from '../../../components/Admin/AdminNavBar';
 
 const posts = () => {
+  const allPosts = trpc.useQuery(['post.getPosts']);
+  console.log(allPosts.data);
+
   // page auth begin
   const role = trpc.useQuery(['user.getRole']);
   const { data: session } = useSession();
@@ -40,9 +43,26 @@ const posts = () => {
       <Box>
         <AdminNavBar />
         <Box p={3}>
-          <Link href={'/admin/dashboard/posts/create'}>
-            <Button>Create post</Button>
-          </Link>
+          <Box pb={3}>
+            <Link href={'/admin/dashboard/posts/create'}>
+              <Button>Create post</Button>
+            </Link>
+          </Box>
+          <Stack>
+            {allPosts.data?.map((post) => (
+              <Link href={`/admin/dashboard/posts/${post.postId}`}>
+                <Box bg={'gray.200'} p={3} rounded={'lg'} key={post.postId}>
+                  <>
+                    {post.title}
+                    {post.content}
+                    {post.publishDate?.toDateString}
+                    {post.published}
+                    {post.author}
+                  </>
+                </Box>
+              </Link>
+            ))}
+          </Stack>
         </Box>
       </Box>
     </>

@@ -54,4 +54,14 @@ export const postRouter = createProtectedRouter()
         },
       });
     },
+  })
+  .query('getPost', {
+    input: z.object({
+      postId: z.string(),
+    }),
+    async resolve({ ctx, input }) {
+      return await ctx.prisma.post.findFirst({
+        where: { postId: input.postId },
+      });
+    },
   });

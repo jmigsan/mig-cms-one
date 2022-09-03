@@ -22,7 +22,7 @@ import {
 import { Editor, EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 
-const MenuBar: React.FC<{ editor: Editor | null }> = ({ editor }) => {
+const MenuBar = ({ editor }: { editor: Editor | null }) => {
   if (!editor) {
     return null;
   }
@@ -135,12 +135,14 @@ const MenuBar: React.FC<{ editor: Editor | null }> = ({ editor }) => {
 
 const TipTap: React.FC<{
   setContent: React.Dispatch<React.SetStateAction<string>>;
-}> = ({ setContent }) => {
+  content: string;
+}> = ({ setContent, content }) => {
   const editor = useEditor({
     extensions: [StarterKit],
     onUpdate: ({ editor }) => {
       setContent(editor.getHTML());
     },
+    content: content,
   });
 
   return (

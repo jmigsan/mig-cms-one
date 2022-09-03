@@ -23,6 +23,7 @@ import { useRouter } from 'next/router';
 import { useSession } from 'next-auth/react';
 import UnauthorisedAdminPage from '../../../../components/Admin/PagesNoSSR/UnauthorisedAdminPage';
 import Head from 'next/head';
+import AdminNavBar from '../../../../components/Admin/AdminNavBar';
 
 const AddPosts = () => {
   const name = trpc.useQuery(['user.getName'], {
@@ -110,6 +111,7 @@ const AddPosts = () => {
         <link rel='icon' href='/favicon.ico' />
       </Head>
       <Box>
+        <AdminNavBar />
         <Center p={6}>
           <Text fontSize={'2xl'}>Add Post</Text>
         </Center>
@@ -130,7 +132,7 @@ const AddPosts = () => {
 
               <FormLabel>Content</FormLabel>
 
-              <TipTap setContent={setContent} />
+              <TipTap setContent={setContent} content='' />
 
               <FormLabel>Date</FormLabel>
               <Input
