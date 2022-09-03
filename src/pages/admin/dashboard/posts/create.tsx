@@ -1,3 +1,5 @@
+import dynamic from 'next/dynamic';
+
 import {
   Button,
   Input,
@@ -9,14 +11,20 @@ import {
   FormControl,
   HStack,
   Center,
+  useToast,
+  Spinner,
+  Box,
 } from '@chakra-ui/react';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { trpc } from '../../../../utils/trpc';
 import TipTap from '../../../../components/Admin/TipTap';
-import axios from 'axios';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { useSession } from 'next-auth/react';
+import UnauthorisedAdminPage from '../../../../components/Admin/PagesNoSSR/UnauthorisedAdminPage';
+import Head from 'next/head';
 
-const AddProductDrawer = () => {
+const AddPosts = () => {
   const name = trpc.useQuery(['user.getName'], {
     refetchOnWindowFocus: false,
   });
@@ -28,83 +36,132 @@ const AddProductDrawer = () => {
   const [publishDate, setPublishDate] = useState('');
   const [author, setAuthor] = useState('');
 
-  // uploading to postgres
-  const createPostMutation = trpc.useMutation(['product.uploadProduct']);
+  // upload to postgres
+  const createPostMutation = trpc.useMutation(['post.uploadPost']);
+  const router = useRouter();
+  const toast = useToast();
 
-  const saveProduct = async () => {
-    const datePublishDate = new Date(publishDate);
+  const savePost = async () => {
+    try {
+      const datePublishDate = new Date(publishDate);
 
-    console.log(datePublishDate);
-    console.log('yo');
+      let screenedContent = '';
 
-    let screenedContent = '';
+      if (content === '<p></p>') {
+        screenedContent = '';
+      } else {
+        screenedContent = content;
+      }
 
-    if (content === '<p></p>') {
-      screenedContent = '';
-    } else {
-      screenedContent = content;
+      createPostMutation.mutate({
+        title,
+        published: publish,
+        content: screenedContent,
+        publishDate: datePublishDate,
+        author,
+      });
+
+      router.push('/admin/dashboard/posts');
+
+      toast({
+        title: 'Post created',
+        description: 'Successfully created a post',
+        status: 'success',
+        duration: 7500,
+        isClosable: true,
+      });
+    } catch (err) {
+      console.log(err);
+      toast({
+        title: 'Post failed',
+        status: 'error',
+        duration: 7500,
+        isClosable: true,
+      });
     }
-
-    createPostMutation.mutate({
-      title,
-      published: publish,
-      content: screenedContent,
-      publishDate: datePublishDate,
-      author,
-    });
   };
+
+  // page auth begin
+  const role = trpc.useQuery(['user.getRole']);
+  const { data: session } = useSession();
+
+  if (!session) {
+    return <UnauthorisedAdminPage />;
+  }
+
+  if (!role.data) {
+    return (
+      <Center pt={6}>
+        <Spinner />
+      </Center>
+    );
+  }
+
+  if (role.data !== 'ADMIN') {
+    return <UnauthorisedAdminPage />;
+  }
+  // page auth end
 
   return (
     <>
-      <Center p={6}>
-        <Text fontSize={'2xl'}>Add Post</Text>
-      </Center>
+      <Head>
+        <title>MigMS Admin</title>
+        <meta name='description' content="Mig's CMS" />
+        <link rel='icon' href='/favicon.ico' />
+      </Head>
+      <Box>
+        <Center p={6}>
+          <Text fontSize={'2xl'}>Add Post</Text>
+        </Center>
 
-      <Container maxW={'3xl'}>
-        <FormControl>
-          <Stack spacing={2}>
-            <FormLabel>Title</FormLabel>
-            <Input onChange={(e) => setTitle(e.target.value)} />
-            <FormLabel>Publish</FormLabel>
-            <HStack>
-              <Switch
-                isChecked={publish}
-                onChange={(e) => setPublish(e.target.checked)}
+        <Container maxW={'3xl'}>
+          <FormControl>
+            <Stack spacing={2}>
+              <FormLabel>Title</FormLabel>
+              <Input onChange={(e) => setTitle(e.target.value)} />
+              <FormLabel>Publish</FormLabel>
+              <HStack>
+                <Switch
+                  isChecked={publish}
+                  onChange={(e) => setPublish(e.target.checked)}
+                />
+                <Text>{publish ? 'Publish' : 'Draft'}</Text>
+              </HStack>
+
+              <FormLabel>Content</FormLabel>
+
+              <TipTap setContent={setContent} />
+
+              <FormLabel>Date</FormLabel>
+              <Input
+                type={'date'}
+                onChange={(e) => setPublishDate(e.target.value)}
               />
-              <Text>{publish ? 'Publish' : 'Draft'}</Text>
-            </HStack>
+              <Text>{publishDate}</Text>
+              <FormLabel>Author</FormLabel>
+              <Input
+                onChange={(e) => setAuthor(e.target.value)}
+                defaultValue={name.data || ''}
+              />
+            </Stack>
+          </FormControl>
+        </Container>
+        <Center p={5}>
+          <HStack>
+            <Link href={'/admin/dashboard/products'}>
+              <Button>Back</Button>
+            </Link>
 
-            <FormLabel>Content</FormLabel>
-
-            <TipTap setContent={setContent} />
-
-            <FormLabel>Date</FormLabel>
-            <Input
-              type={'date'}
-              onChange={(e) => setPublishDate(e.target.value)}
-            />
-            <Text>{publishDate}</Text>
-            <FormLabel>Author</FormLabel>
-            <Input
-              onChange={(e) => setAuthor(e.target.value)}
-              defaultValue={name.data || ''}
-            />
-          </Stack>
-        </FormControl>
-      </Container>
-      <Center p={5}>
-        <HStack>
-          <Link href={'/admin/dashboard/products'}>
-            <Button>Back</Button>
-          </Link>
-
-          <Button variant='ghost' onClick={() => saveProduct()}>
-            Save Product
-          </Button>
-        </HStack>
-      </Center>
+            <Button variant='ghost' onClick={() => savePost()}>
+              Save Post
+            </Button>
+          </HStack>
+        </Center>
+      </Box>
     </>
   );
 };
 
-export default AddProductDrawer;
+export default dynamic(() => Promise.resolve(AddPosts), {
+  ssr: false,
+});

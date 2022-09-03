@@ -1,3 +1,5 @@
+import dynamic from 'next/dynamic';
+
 import {
   Box,
   Button,
@@ -14,12 +16,13 @@ import UnauthorisedAdminPage from '../../components/Admin/PagesNoSSR/Unauthorise
 import Link from 'next/link';
 
 const Dashboard = () => {
-  const role = trpc.useQuery(['user.getRole']);
   const img = trpc.useQuery([
     'b2.getSignedGet',
     { fileKey: 'bvycw2zdjqv08n.jpeg' },
   ]);
 
+  // page auth begin
+  const role = trpc.useQuery(['user.getRole']);
   const { data: session } = useSession();
 
   if (!session) {
@@ -34,36 +37,39 @@ const Dashboard = () => {
     );
   }
 
-  if (role.data === 'ADMIN') {
-    return (
-      <>
-        <Head>
-          <title>MigMS Admin Dashboard</title>
-          <meta name='description' content="Mig's CMS" />
-          <link rel='icon' href='/favicon.ico' />
-        </Head>
-        <Box>
-          <Box p={4}>
-            <Text>Admin Dashboard</Text>
-            <Box>
-              <HStack>
-                <Link href={'/admin/dashboard/posts'}>
-                  <Button>Posts</Button>
-                </Link>
-                <Link href={'/admin/dashboard/products'}>
-                  <Button>Products</Button>
-                </Link>
-              </HStack>
-              {/* <img src={img.data?.uploadUrl} alt={'oi'} /> */}
-              {/* <button onClick={() => console.log(img.data)}>yo</button> */}
-            </Box>
-          </Box>
-        </Box>
-      </>
-    );
-  } else {
+  if (role.data !== 'ADMIN') {
     return <UnauthorisedAdminPage />;
   }
+  // page auth end
+
+  return (
+    <>
+      <Head>
+        <title>MigMS Admin Dashboard</title>
+        <meta name='description' content="Mig's CMS" />
+        <link rel='icon' href='/favicon.ico' />
+      </Head>
+      <Box>
+        <Box p={4}>
+          <Text>Admin Dashboard</Text>
+          <Box>
+            <HStack>
+              <Link href={'/admin/dashboard/posts'}>
+                <Button>Posts</Button>
+              </Link>
+              <Link href={'/admin/dashboard/products'}>
+                <Button>Products</Button>
+              </Link>
+            </HStack>
+            {/* <img src={img.data?.uploadUrl} alt={'oi'} /> */}
+            {/* <button onClick={() => console.log(img.data)}>yo</button> */}
+          </Box>
+        </Box>
+      </Box>
+    </>
+  );
 };
 
-export default Dashboard;
+export default dynamic(() => Promise.resolve(Dashboard), {
+  ssr: false,
+});

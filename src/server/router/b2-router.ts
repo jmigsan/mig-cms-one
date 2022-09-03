@@ -10,6 +10,7 @@ export const b2Router = createProtectedRouter()
       fileType: z.string(),
     }),
     async resolve({ ctx, input }) {
+      // authorisation begin
       if (!ctx.session.user.id) {
         throw new Error('please sign in');
       }
@@ -22,6 +23,7 @@ export const b2Router = createProtectedRouter()
       if (userRole?.role !== 'ADMIN') {
         throw new Error('you are not authorised');
       }
+      // authorisation end
 
       const fileId = nanoid();
       const fileExtension = input.fileType.split('%2F')[1];

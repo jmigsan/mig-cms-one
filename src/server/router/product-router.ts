@@ -13,6 +13,11 @@ export const productRouter = createProtectedRouter()
       return 'He who asks a question is a fool for five minutes; he who does not ask a question remains a fool forever.';
     },
   })
+  .query('getProducts', {
+    async resolve({ ctx }) {
+      return await ctx.prisma.product.findMany();
+    },
+  })
   .mutation('uploadProduct', {
     input: z
       .object({
@@ -24,7 +29,22 @@ export const productRouter = createProtectedRouter()
       })
       .nullish(),
     async resolve({ ctx, input }) {
-      return await ctx.prisma.post.create({
+      // authorisation begin
+      if (!ctx.session.user.id) {
+        throw new Error('please sign in');
+      }
+
+      const userRole = await ctx.prisma.user.findFirst({
+        where: { id: ctx.session.user.id },
+        select: { role: true },
+      });
+
+      if (userRole?.role !== 'ADMIN') {
+        throw new Error('you are not authorised');
+      }
+      // authorisation end
+
+      return await ctx.prisma.product.create({
         data: {
           title: input?.title || 'no title',
           published: input?.published || false,

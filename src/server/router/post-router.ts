@@ -29,6 +29,21 @@ export const postRouter = createProtectedRouter()
       })
       .nullish(),
     async resolve({ ctx, input }) {
+      // authorisation begin
+      if (!ctx.session.user.id) {
+        throw new Error('please sign in');
+      }
+
+      const userRole = await ctx.prisma.user.findFirst({
+        where: { id: ctx.session.user.id },
+        select: { role: true },
+      });
+
+      if (userRole?.role !== 'ADMIN') {
+        throw new Error('you are not authorised');
+      }
+      // authorisation end
+
       return await ctx.prisma.post.create({
         data: {
           title: input?.title || 'no title',
