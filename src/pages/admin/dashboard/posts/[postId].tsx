@@ -66,6 +66,14 @@ const EditPost = () => {
         duration: 100000,
       });
     },
+    onError: () => {
+      toast({
+        title: 'Post failed',
+        status: 'error',
+        duration: 7000,
+        isClosable: true,
+      });
+    },
     onSettled: () => {
       utils.invalidateQueries(['post.getPosts']);
       utils.fetchQuery(['post.getPost', { postId }]);
@@ -82,37 +90,27 @@ const EditPost = () => {
   const toast = useToast();
 
   const savePost = async () => {
-    try {
-      const datePublishDate = new Date(publishDate);
+    const datePublishDate = new Date(publishDate);
 
-      let screenedContent = '';
+    let screenedContent = '';
 
-      if (content === '<p></p>') {
-        screenedContent = '';
-      } else {
-        screenedContent = content;
-      }
-
-      updatePostMutation.mutate({
-        postId,
-        title,
-        published: publish,
-        content: screenedContent,
-        publishDate: datePublishDate,
-        author,
-      });
-
-      router.push('/admin/dashboard/posts');
-      utils.invalidateQueries(['post.getPosts']);
-    } catch (err) {
-      console.log(err);
-      toast({
-        title: 'Post failed',
-        status: 'error',
-        duration: 7000,
-        isClosable: true,
-      });
+    if (content === '<p></p>') {
+      screenedContent = '';
+    } else {
+      screenedContent = content;
     }
+
+    updatePostMutation.mutate({
+      postId,
+      title,
+      published: publish,
+      content: screenedContent,
+      publishDate: datePublishDate,
+      author,
+    });
+
+    router.push('/admin/dashboard/posts');
+    utils.invalidateQueries(['post.getPosts']);
   };
 
   // page auth begin
