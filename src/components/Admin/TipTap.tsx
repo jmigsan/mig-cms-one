@@ -136,7 +136,14 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
 const TipTap: React.FC<{
   setContent: React.Dispatch<React.SetStateAction<string>>;
   content: string;
-}> = ({ setContent, content }) => {
+  editMode: boolean;
+}> = ({ setContent, content, editMode }) => {
+  if (editMode) {
+    if (!content) {
+      return null;
+    }
+  }
+
   const editor = useEditor({
     extensions: [StarterKit],
     onUpdate: ({ editor }) => {

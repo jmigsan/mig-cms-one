@@ -44,7 +44,7 @@ const AddProductDrawer = () => {
     const datePublishDate = new Date(publishDate);
 
     console.log(datePublishDate);
-    console.log('yo');
+    // console.log('yo');
 
     let screenedContent = '';
 
@@ -155,7 +155,7 @@ const AddProductDrawer = () => {
 
                   <FormLabel>Content</FormLabel>
 
-                  <TipTap setContent={setContent} />
+                  <TipTap setContent={setContent} content='' editMode={false} />
 
                   <FormLabel>Date</FormLabel>
                   <Input

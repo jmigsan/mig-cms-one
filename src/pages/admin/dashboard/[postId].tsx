@@ -84,7 +84,7 @@ const EditPost = (
         title: 'Post created',
         description: 'Successfully created a post',
         status: 'success',
-        duration: 7500,
+        duration: 7000,
         isClosable: true,
       });
     } catch (err) {
@@ -92,7 +92,7 @@ const EditPost = (
       toast({
         title: 'Post failed',
         status: 'error',
-        duration: 7500,
+        duration: 7000,
         isClosable: true,
       });
     }
@@ -166,7 +166,7 @@ const EditPost = (
         </Container>
         <Center p={5}>
           <HStack>
-            <Link href={'/admin/dashboard/products'}>
+            <Link href={'/admin/dashboard/posts'}>
               <Button>Back</Button>
             </Link>
 

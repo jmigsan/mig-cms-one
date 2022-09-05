@@ -10,7 +10,7 @@ import AdminNavBar from '../../../components/Admin/AdminNavBar';
 
 const posts = () => {
   const allPosts = trpc.useQuery(['post.getPosts']);
-  console.log(allPosts.data);
+  // console.log(allPosts.data);
 
   // page auth begin
   const role = trpc.useQuery(['user.getRole']);
@@ -50,8 +50,11 @@ const posts = () => {
           </Box>
           <Stack>
             {allPosts.data?.map((post) => (
-              <Link href={`/admin/dashboard/posts/${post.postId}`}>
-                <Box bg={'gray.200'} p={3} rounded={'lg'} key={post.postId}>
+              <Link
+                href={`/admin/dashboard/posts/${post.postId}`}
+                key={post.postId}
+              >
+                <Box bg={'gray.200'} p={3} rounded={'lg'}>
                   <>
                     {post.title}
                     {post.content}

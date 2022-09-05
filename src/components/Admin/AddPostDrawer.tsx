@@ -48,8 +48,8 @@ const AddPostDrawer = () => {
   const savePost = async () => {
     const datePublishDate = new Date(publishDate);
 
-    console.log(datePublishDate);
-    console.log('yo');
+    // console.log(datePublishDate);
+    // console.log('yo');
 
     let screenedContent = '';
 

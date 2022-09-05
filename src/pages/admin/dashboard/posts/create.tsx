@@ -68,7 +68,7 @@ const AddPosts = () => {
         title: 'Post created',
         description: 'Successfully created a post',
         status: 'success',
-        duration: 7500,
+        duration: 7000,
         isClosable: true,
       });
     } catch (err) {
@@ -76,7 +76,7 @@ const AddPosts = () => {
       toast({
         title: 'Post failed',
         status: 'error',
-        duration: 7500,
+        duration: 7000,
         isClosable: true,
       });
     }
@@ -132,7 +132,7 @@ const AddPosts = () => {
 
               <FormLabel>Content</FormLabel>
 
-              <TipTap setContent={setContent} content='' />
+              <TipTap setContent={setContent} content='' editMode={false} />
 
               <FormLabel>Date</FormLabel>
               <Input
@@ -150,7 +150,7 @@ const AddPosts = () => {
         </Container>
         <Center p={5}>
           <HStack>
-            <Link href={'/admin/dashboard/products'}>
+            <Link href={'/admin/dashboard/posts'}>
               <Button>Back</Button>
             </Link>
 

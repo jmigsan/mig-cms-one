@@ -15,7 +15,7 @@ import {
   Spinner,
   Box,
 } from '@chakra-ui/react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { trpc } from '../../../../utils/trpc';
 import TipTap from '../../../../components/Admin/TipTap';
 import Link from 'next/link';
@@ -26,10 +26,7 @@ import Head from 'next/head';
 import AdminNavBar from '../../../../components/Admin/AdminNavBar';
 
 const EditPost = () => {
-  const name = trpc.useQuery(['user.getName'], {
-    refetchOnWindowFocus: false,
-  });
-
+  // get post data
   const router = useRouter();
   const postId = router.query.postId as string;
   const post = trpc.useQuery(['post.getPost', { postId }]);
@@ -41,9 +38,47 @@ const EditPost = () => {
   const [publishDate, setPublishDate] = useState('');
   const [author, setAuthor] = useState('');
 
+  // set default post data
+  const titleContainer = useRef(null);
+
+  useEffect(() => {
+    if (titleContainer.current) {
+      if (title === '') {
+        setTitle(post.data?.title as string);
+        setPublish(post.data?.published as boolean);
+        setContent(post.data?.content as string);
+        setPublishDate(
+          post.data?.publishDate?.toISOString().substring(0, 10) as string
+        );
+        setAuthor(post.data?.author as string);
+      }
+    }
+  }, [post]);
+
   // upload to postgres
-  const createPostMutation = trpc.useMutation(['post.uploadPost']);
-  // const router = useRouter();
+  const utils = trpc.useContext();
+  const updatePostMutation = trpc.useMutation(['post.updatePost'], {
+    onMutate: () => {
+      toast({
+        title: 'Post updating',
+        description: 'Please wait',
+        status: 'loading',
+        duration: 100000,
+      });
+    },
+    onSettled: () => {
+      utils.invalidateQueries(['post.getPosts']);
+      utils.fetchQuery(['post.getPost', { postId }]);
+      toast.closeAll();
+      toast({
+        title: 'Post updated',
+        description: 'Successfully updated a post',
+        status: 'success',
+        duration: 7000,
+        isClosable: true,
+      });
+    },
+  });
   const toast = useToast();
 
   const savePost = async () => {
@@ -58,7 +93,8 @@ const EditPost = () => {
         screenedContent = content;
       }
 
-      createPostMutation.mutate({
+      updatePostMutation.mutate({
+        postId,
         title,
         published: publish,
         content: screenedContent,
@@ -67,20 +103,13 @@ const EditPost = () => {
       });
 
       router.push('/admin/dashboard/posts');
-
-      toast({
-        title: 'Post created',
-        description: 'Successfully created a post',
-        status: 'success',
-        duration: 7500,
-        isClosable: true,
-      });
+      utils.invalidateQueries(['post.getPosts']);
     } catch (err) {
       console.log(err);
       toast({
         title: 'Post failed',
         status: 'error',
-        duration: 7500,
+        duration: 7000,
         isClosable: true,
       });
     }
@@ -134,15 +163,15 @@ const EditPost = () => {
             <Stack spacing={2}>
               <FormLabel>Title</FormLabel>
               <Input
+                ref={titleContainer}
                 onChange={(e) => setTitle(e.target.value)}
-                defaultValue={post.data?.title}
+                value={title}
               />
               <FormLabel>Publish</FormLabel>
               <HStack>
                 <Switch
                   isChecked={publish}
                   onChange={(e) => setPublish(e.target.checked)}
-                  defaultChecked={post.data?.published}
                 />
 
                 <Text>{publish ? 'Publish' : 'Draft'}</Text>
@@ -152,26 +181,28 @@ const EditPost = () => {
 
               <TipTap
                 setContent={setContent}
-                content={post.data?.content as string}
+                content={content}
+                editMode={true}
               />
 
               <FormLabel>Date</FormLabel>
               <Input
                 type={'date'}
                 onChange={(e) => setPublishDate(e.target.value)}
+                value={publishDate}
               />
-              <Text>{publishDate}</Text>
+
               <FormLabel>Author</FormLabel>
               <Input
                 onChange={(e) => setAuthor(e.target.value)}
-                defaultValue={name.data || ''}
+                value={author}
               />
             </Stack>
           </FormControl>
         </Container>
         <Center p={5}>
           <HStack>
-            <Link href={'/admin/dashboard/products'}>
+            <Link href={'/admin/dashboard/posts'}>
               <Button>Back</Button>
             </Link>
 

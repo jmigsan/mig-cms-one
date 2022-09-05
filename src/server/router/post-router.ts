@@ -18,6 +18,16 @@ export const postRouter = createProtectedRouter()
       return await ctx.prisma.post.findMany();
     },
   })
+  .query('getPost', {
+    input: z.object({
+      postId: z.string(),
+    }),
+    async resolve({ ctx, input }) {
+      return await ctx.prisma.post.findFirst({
+        where: { postId: input.postId },
+      });
+    },
+  })
   .mutation('uploadPost', {
     input: z
       .object({
@@ -55,13 +65,44 @@ export const postRouter = createProtectedRouter()
       });
     },
   })
-  .query('getPost', {
-    input: z.object({
-      postId: z.string(),
-    }),
+  .mutation('updatePost', {
+    input: z
+      .object({
+        postId: z.string(),
+        title: z.string(),
+        published: z.boolean(),
+        content: z.string(),
+        publishDate: z.date().nullish(),
+        author: z.string().nullish(),
+      })
+      .nullish(),
     async resolve({ ctx, input }) {
-      return await ctx.prisma.post.findFirst({
-        where: { postId: input.postId },
+      // authorisation begin
+      if (!ctx.session.user.id) {
+        throw new Error('please sign in');
+      }
+
+      const userRole = await ctx.prisma.user.findFirst({
+        where: { id: ctx.session.user.id },
+        select: { role: true },
+      });
+
+      if (userRole?.role !== 'ADMIN') {
+        throw new Error('you are not authorised');
+      }
+      // authorisation end
+
+      return await ctx.prisma.post.update({
+        where: {
+          postId: input?.postId,
+        },
+        data: {
+          title: input?.title || 'no title',
+          published: input?.published || false,
+          content: input?.content || '<p>no content</p>',
+          publishDate: input?.publishDate,
+          author: input?.author || 'Anonymous',
+        },
       });
     },
   });

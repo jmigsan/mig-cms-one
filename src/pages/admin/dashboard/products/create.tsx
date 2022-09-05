@@ -69,7 +69,7 @@ const AddProduct = () => {
         title: 'Product created',
         description: 'Successfully created a product',
         status: 'success',
-        duration: 7500,
+        duration: 7000,
         isClosable: true,
       });
     } catch (err) {
@@ -77,7 +77,7 @@ const AddProduct = () => {
       toast({
         title: 'Product creation failed',
         status: 'error',
-        duration: 7500,
+        duration: 7000,
         isClosable: true,
       });
     }

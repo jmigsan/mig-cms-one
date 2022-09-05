@@ -17,10 +17,10 @@ const UnauthorisedAdminPage = () => {
           </Center>
           <Center>
             <Text>
-              Please{' '}
-              <ChakraLink color={'blue'}>
+              Please
+              <Text color={'blue'} as={'span'}>
                 <Link href={'/admin'}>sign in</Link>
-              </ChakraLink>{' '}
+              </Text>
               as an administrator to access this page.
             </Text>
           </Center>

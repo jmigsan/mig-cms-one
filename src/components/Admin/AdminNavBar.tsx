@@ -18,7 +18,7 @@ import {
 } from '@chakra-ui/react';
 import Link from 'next/link';
 import { HamburgerIcon, CloseIcon } from '@chakra-ui/icons';
-import { useSession } from 'next-auth/react';
+import { signOut, useSession } from 'next-auth/react';
 import { trpc } from '../../utils/trpc';
 
 const Links = [
@@ -88,10 +88,7 @@ export default function withAction() {
                 <Avatar size={'sm'} src={userPic.data || ''} />
               </MenuButton>
               <MenuList>
-                <MenuItem>Link 1</MenuItem>
-                <MenuItem>Link 2</MenuItem>
-                <MenuDivider />
-                <MenuItem>Link 3</MenuItem>
+                <MenuItem onClick={() => signOut()}>Sign Out</MenuItem>
               </MenuList>
             </Menu>
           </Flex>
