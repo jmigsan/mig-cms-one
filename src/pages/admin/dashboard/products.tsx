@@ -43,14 +43,17 @@ const products = () => {
         <AdminNavBar />
         <Box p={3}>
           <Box pb={3}>
-            <Link href={'/admin/dashboard/product/create'}>
+            <Link href={'/admin/dashboard/products/create'}>
               <Button>Create product</Button>
             </Link>
           </Box>
           <Stack>
             {allProducts.data?.map((product) => (
-              <Link href={`/admin/dashboard/products/${product.postId}`}>
-                <Box bg={'gray.200'} p={3} rounded={'lg'} key={product.postId}>
+              <Link
+                href={`/admin/dashboard/products/${product.productId}`}
+                key={product.productId}
+              >
+                <Box bg={'gray.200'} p={3} rounded={'lg'}>
                   <>
                     {product.title}
                     {product.content}

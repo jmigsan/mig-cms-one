@@ -10,7 +10,6 @@ import AdminNavBar from '../../../components/Admin/AdminNavBar';
 
 const posts = () => {
   const allPosts = trpc.useQuery(['post.getPosts']);
-  // console.log(allPosts.data);
 
   // page auth begin
   const role = trpc.useQuery(['user.getRole']);

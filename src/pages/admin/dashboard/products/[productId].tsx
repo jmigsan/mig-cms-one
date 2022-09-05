@@ -24,37 +24,44 @@ import { useSession } from 'next-auth/react';
 import UnauthorisedAdminPage from '../../../../components/Admin/PagesNoSSR/UnauthorisedAdminPage';
 import Head from 'next/head';
 import AdminNavBar from '../../../../components/Admin/AdminNavBar';
+import axios from 'axios';
 
-const EditPost = () => {
-  // store post data
+const EditProduct = () => {
+  // get product data
+  const router = useRouter();
+  const productId = router.query.productId as string;
+  const post = trpc.useQuery(['product.getProduct', { productId }]);
+
+  // store product data
   const [title, setTitle] = useState('');
   const [publish, setPublish] = useState(false);
   const [content, setContent] = useState('');
   const [publishDate, setPublishDate] = useState('');
   const [author, setAuthor] = useState('');
 
-  // get name
-  const name = trpc.useQuery(['user.getName'], {
-    refetchOnWindowFocus: false,
-  });
-
-  const authorContainer = useRef(null);
+  // set default product data
+  const titleContainer = useRef(null);
 
   useEffect(() => {
-    if (authorContainer.current) {
-      if (author === '') {
-        setAuthor(name.data as string);
+    if (titleContainer.current) {
+      if (title === '') {
+        setTitle(post.data?.title as string);
+        setPublish(post.data?.published as boolean);
+        setContent(post.data?.content as string);
+        setPublishDate(
+          post.data?.publishDate?.toISOString().substring(0, 10) as string
+        );
+        setAuthor(post.data?.author as string);
       }
     }
-  }, [name]);
+  }, [post]);
 
   // upload to postgres
   const utils = trpc.useContext();
-  const router = useRouter();
-  const uploadPostMutation = trpc.useMutation(['post.uploadPost'], {
+  const updateProductMutation = trpc.useMutation(['product.updateProduct'], {
     onMutate: () => {
       toast({
-        title: 'Post uploading',
+        title: 'Product updating',
         description: 'Please wait',
         status: 'loading',
         duration: 100000,
@@ -62,18 +69,19 @@ const EditPost = () => {
     },
     onError: () => {
       toast({
-        title: 'Post failed',
+        title: 'Product failed',
         status: 'error',
         duration: 7000,
         isClosable: true,
       });
     },
     onSettled: () => {
-      utils.invalidateQueries(['post.getPosts']);
+      utils.invalidateQueries(['product.getProducts']);
+      utils.fetchQuery(['product.getProduct', { productId }]);
       toast.closeAll();
       toast({
-        title: 'Post uploaded',
-        description: 'Successfully updated a post',
+        title: 'Product updated',
+        description: 'Successfully updated a product',
         status: 'success',
         duration: 7000,
         isClosable: true,
@@ -82,7 +90,7 @@ const EditPost = () => {
   });
   const toast = useToast();
 
-  const savePost = async () => {
+  const saveProduct = async () => {
     const datePublishDate = new Date(publishDate);
 
     let screenedContent = '';
@@ -93,7 +101,8 @@ const EditPost = () => {
       screenedContent = content;
     }
 
-    uploadPostMutation.mutate({
+    updateProductMutation.mutate({
+      productId,
       title,
       published: publish,
       content: screenedContent,
@@ -101,8 +110,39 @@ const EditPost = () => {
       author,
     });
 
-    router.push('/admin/dashboard/posts');
-    utils.invalidateQueries(['post.getPosts']);
+    router.push('/admin/dashboard/products');
+    utils.invalidateQueries(['product.getProducts']);
+  };
+
+  // upload to s3
+  const getSignedPut = trpc.useMutation(['b2.getSignedPut']);
+
+  const [file, setFile] = useState<File>();
+
+  const uploadFile = async () => {
+    if (!file) {
+      return null;
+    }
+
+    const fileType = encodeURIComponent(file.type);
+    console.log(fileType);
+
+    const signedUrl = await getSignedPut.mutateAsync({ fileType: fileType });
+    console.log(signedUrl);
+
+    await axios.put(signedUrl.uploadUrl, file);
+
+    return signedUrl.key;
+  };
+
+  // reset file
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const resetFile = () => {
+    if (inputRef.current !== null) {
+      setFile(undefined);
+      inputRef.current.value = '';
+    }
   };
 
   // page auth begin
@@ -126,6 +166,14 @@ const EditPost = () => {
   }
   // page auth end
 
+  if (post.isLoading) {
+    return (
+      <Center pt={6}>
+        <Spinner />
+      </Center>
+    );
+  }
+
   return (
     <>
       <Head>
@@ -137,14 +185,18 @@ const EditPost = () => {
         <AdminNavBar />
 
         <Center p={6}>
-          <Text fontSize={'2xl'}>Add Post</Text>
+          <Text fontSize={'2xl'}>Add Product</Text>
         </Center>
 
         <Container maxW={'3xl'}>
           <FormControl>
             <Stack spacing={2}>
               <FormLabel>Title</FormLabel>
-              <Input onChange={(e) => setTitle(e.target.value)} value={title} />
+              <Input
+                ref={titleContainer}
+                onChange={(e) => setTitle(e.target.value)}
+                value={title}
+              />
               <FormLabel>Publish</FormLabel>
               <HStack>
                 <Switch
@@ -155,12 +207,25 @@ const EditPost = () => {
                 <Text>{publish ? 'Publish' : 'Draft'}</Text>
               </HStack>
 
+              <FormLabel>Image</FormLabel>
+              <Input
+                type={'file'}
+                accept={'image/jpeg, image/png'}
+                ref={inputRef}
+                onChange={(e) => setFile(e.target.files?.[0] || undefined)}
+                variant={'unstyled'}
+              />
+              <HStack>
+                <Button onClick={() => uploadFile()}>Upload File</Button>
+                <Button onClick={() => resetFile()}>Reset File</Button>
+              </HStack>
+
               <FormLabel>Content</FormLabel>
 
               <TipTap
                 setContent={setContent}
                 content={content}
-                editMode={false}
+                editMode={true}
               />
 
               <FormLabel>Date</FormLabel>
@@ -174,19 +239,18 @@ const EditPost = () => {
               <Input
                 onChange={(e) => setAuthor(e.target.value)}
                 value={author}
-                ref={authorContainer}
               />
             </Stack>
           </FormControl>
         </Container>
         <Center p={5}>
           <HStack>
-            <Link href={'/admin/dashboard/posts'}>
+            <Link href={'/admin/dashboard/products'}>
               <Button>Back</Button>
             </Link>
 
-            <Button variant='ghost' onClick={() => savePost()}>
-              Save Post
+            <Button variant='ghost' onClick={() => saveProduct()}>
+              Save Product
             </Button>
           </HStack>
         </Center>
@@ -195,6 +259,6 @@ const EditPost = () => {
   );
 };
 
-export default dynamic(() => Promise.resolve(EditPost), {
+export default dynamic(() => Promise.resolve(EditProduct), {
   ssr: false,
 });

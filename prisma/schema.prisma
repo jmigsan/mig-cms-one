@@ -80,7 +80,7 @@ model Post {
 }
 
 model Product {
-    postId String  @id @default(cuid())
+    productId String  @id @default(cuid())
     title String
     published Boolean @default(false)
     content String

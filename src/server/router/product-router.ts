@@ -18,6 +18,16 @@ export const productRouter = createProtectedRouter()
       return await ctx.prisma.product.findMany();
     },
   })
+  .query('getProduct', {
+    input: z.object({
+      productId: z.string(),
+    }),
+    async resolve({ ctx, input }) {
+      return await ctx.prisma.product.findFirst({
+        where: { productId: input.productId },
+      });
+    },
+  })
   .mutation('uploadProduct', {
     input: z
       .object({
@@ -45,6 +55,47 @@ export const productRouter = createProtectedRouter()
       // authorisation end
 
       return await ctx.prisma.product.create({
+        data: {
+          title: input?.title || 'no title',
+          published: input?.published || false,
+          content: input?.content || '<p>no content</p>',
+          publishDate: input?.publishDate,
+          author: input?.author || 'Anonymous',
+        },
+      });
+    },
+  })
+  .mutation('updateProduct', {
+    input: z
+      .object({
+        productId: z.string(),
+        title: z.string(),
+        published: z.boolean(),
+        content: z.string(),
+        publishDate: z.date().nullish(),
+        author: z.string().nullish(),
+      })
+      .nullish(),
+    async resolve({ ctx, input }) {
+      // authorisation begin
+      if (!ctx.session.user.id) {
+        throw new Error('please sign in');
+      }
+
+      const userRole = await ctx.prisma.user.findFirst({
+        where: { id: ctx.session.user.id },
+        select: { role: true },
+      });
+
+      if (userRole?.role !== 'ADMIN') {
+        throw new Error('you are not authorised');
+      }
+      // authorisation end
+
+      return await ctx.prisma.product.update({
+        where: {
+          productId: input?.productId,
+        },
         data: {
           title: input?.title || 'no title',
           published: input?.published || false,

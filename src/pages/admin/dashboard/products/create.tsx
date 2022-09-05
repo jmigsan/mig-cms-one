@@ -15,72 +15,95 @@ import {
   Spinner,
   Box,
 } from '@chakra-ui/react';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { trpc } from '../../../../utils/trpc';
 import TipTap from '../../../../components/Admin/TipTap';
-import axios from 'axios';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
-import UnauthorisedAdminPage from '../../../../components/Admin/PagesNoSSR/UnauthorisedAdminPage';
 import { useSession } from 'next-auth/react';
+import UnauthorisedAdminPage from '../../../../components/Admin/PagesNoSSR/UnauthorisedAdminPage';
 import Head from 'next/head';
 import AdminNavBar from '../../../../components/Admin/AdminNavBar';
+import axios from 'axios';
 
-const AddProduct = () => {
-  const name = trpc.useQuery(['user.getName'], {
-    refetchOnWindowFocus: false,
-  });
-
-  // store post data
+const EditProduct = () => {
+  // store product data
   const [title, setTitle] = useState('');
   const [publish, setPublish] = useState(false);
   const [content, setContent] = useState('');
   const [publishDate, setPublishDate] = useState('');
   const [author, setAuthor] = useState('');
 
-  // upload to postgres
-  const createProductMutation = trpc.useMutation(['product.uploadProduct']);
-  const router = useRouter();
-  const toast = useToast();
+  // get name
+  const name = trpc.useQuery(['user.getName'], {
+    refetchOnWindowFocus: false,
+  });
 
-  const saveProduct = async () => {
-    try {
-      const datePublishDate = new Date(publishDate);
+  const authorContainer = useRef(null);
 
-      let screenedContent = '';
-
-      if (content === '<p></p>') {
-        screenedContent = '';
-      } else {
-        screenedContent = content;
+  useEffect(() => {
+    if (authorContainer.current) {
+      if (author === '') {
+        setAuthor(name.data as string);
       }
+    }
+  }, [name]);
 
-      createProductMutation.mutate({
-        title,
-        published: publish,
-        content: screenedContent,
-        publishDate: datePublishDate,
-        author,
-      });
-
-      router.push('/admin/dashboard/products');
-
+  // upload to postgres
+  const utils = trpc.useContext();
+  const router = useRouter();
+  const uploadProductMutation = trpc.useMutation(['product.uploadProduct'], {
+    onMutate: () => {
       toast({
-        title: 'Product created',
-        description: 'Successfully created a product',
-        status: 'success',
-        duration: 7000,
-        isClosable: true,
+        title: 'Product uploading',
+        description: 'Please wait',
+        status: 'loading',
+        duration: 100000,
       });
-    } catch (err) {
-      console.log(err);
+    },
+    onError: () => {
       toast({
-        title: 'Product creation failed',
+        title: 'Product failed',
         status: 'error',
         duration: 7000,
         isClosable: true,
       });
+    },
+    onSettled: () => {
+      utils.invalidateQueries(['product.getProducts']);
+      toast.closeAll();
+      toast({
+        title: 'Product uploaded',
+        description: 'Successfully uploaded a product',
+        status: 'success',
+        duration: 7000,
+        isClosable: true,
+      });
+    },
+  });
+  const toast = useToast();
+
+  const saveProduct = async () => {
+    const datePublishDate = new Date(publishDate);
+
+    let screenedContent = '';
+
+    if (content === '<p></p>') {
+      screenedContent = '';
+    } else {
+      screenedContent = content;
     }
+
+    uploadProductMutation.mutate({
+      title,
+      published: publish,
+      content: screenedContent,
+      publishDate: datePublishDate,
+      author,
+    });
+
+    router.push('/admin/dashboard/products');
+    utils.invalidateQueries(['product.getProducts']);
   };
 
   // upload to s3
@@ -144,22 +167,26 @@ const AddProduct = () => {
       </Head>
       <Box>
         <AdminNavBar />
+
         <Center p={6}>
           <Text fontSize={'2xl'}>Add Product</Text>
         </Center>
+
         <Container maxW={'3xl'}>
           <FormControl>
             <Stack spacing={2}>
               <FormLabel>Title</FormLabel>
-              <Input onChange={(e) => setTitle(e.target.value)} />
+              <Input onChange={(e) => setTitle(e.target.value)} value={title} />
               <FormLabel>Publish</FormLabel>
               <HStack>
                 <Switch
                   isChecked={publish}
                   onChange={(e) => setPublish(e.target.checked)}
                 />
+
                 <Text>{publish ? 'Publish' : 'Draft'}</Text>
               </HStack>
+
               <FormLabel>Image</FormLabel>
               <Input
                 type={'file'}
@@ -175,18 +202,24 @@ const AddProduct = () => {
 
               <FormLabel>Content</FormLabel>
 
-              <TipTap setContent={setContent} content='' />
+              <TipTap
+                setContent={setContent}
+                content={content}
+                editMode={false}
+              />
 
               <FormLabel>Date</FormLabel>
               <Input
                 type={'date'}
                 onChange={(e) => setPublishDate(e.target.value)}
+                value={publishDate}
               />
-              <Text>{publishDate}</Text>
+
               <FormLabel>Author</FormLabel>
               <Input
                 onChange={(e) => setAuthor(e.target.value)}
-                defaultValue={name.data || ''}
+                value={author}
+                ref={authorContainer}
               />
             </Stack>
           </FormControl>
@@ -207,6 +240,6 @@ const AddProduct = () => {
   );
 };
 
-export default dynamic(() => Promise.resolve(AddProduct), {
+export default dynamic(() => Promise.resolve(EditProduct), {
   ssr: false,
 });
