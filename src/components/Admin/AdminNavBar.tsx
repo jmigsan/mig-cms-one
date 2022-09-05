@@ -67,7 +67,7 @@ export default function withAction() {
               display={{ base: 'none', md: 'flex' }}
             >
               {Links.map((link) => (
-                <NavLink text={link.text} link={link.link} />
+                <NavLink text={link.text} link={link.link} key={link.link} />
               ))}
             </HStack>
           </HStack>
@@ -101,7 +101,7 @@ export default function withAction() {
           <Box pb={4} display={{ md: 'none' }}>
             <Stack as={'nav'} spacing={4}>
               {Links.map((link) => (
-                <NavLink text={link.text} link={link.link} />
+                <NavLink text={link.text} link={link.link} key={link.link} />
               ))}
             </Stack>
           </Box>
