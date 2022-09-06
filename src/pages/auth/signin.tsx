@@ -1,6 +1,6 @@
 import { Box, Button, Center, HStack, Image } from '@chakra-ui/react';
 import { getProviders, signIn } from 'next-auth/react';
-import { useEffect } from 'react';
+import { useRouter } from 'next/router';
 
 const SignIn: React.FC<{
   providers: {
@@ -13,15 +13,7 @@ const SignIn: React.FC<{
     };
   };
 }> = ({ providers }) => {
-  let redirectUrl = 'http://localhost:3000';
-
-  useEffect(() => {
-    const url = new URL(location.href);
-    redirectUrl =
-      url.searchParams.get('callbackUrl') !== null
-        ? redirectUrl
-        : 'http://localhost:3000';
-  });
+  const router = useRouter();
 
   if (providers === undefined) {
     return null;
@@ -37,7 +29,9 @@ const SignIn: React.FC<{
                 <Box key={provider.name}>
                   <Button
                     onClick={() =>
-                      signIn(provider.id, { callbackUrl: redirectUrl })
+                      signIn(provider.id, {
+                        callbackUrl: router.query.callbackUrl as string,
+                      })
                     }
                   >
                     Sign in with {provider.name}
