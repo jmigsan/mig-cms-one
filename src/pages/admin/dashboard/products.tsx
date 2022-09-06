@@ -7,6 +7,7 @@ import UnauthorisedAdminPage from '../../../components/Admin/PagesNoSSR/Unauthor
 import { trpc } from '../../../utils/trpc';
 import { useSession } from 'next-auth/react';
 import AdminNavBar from '../../../components/Admin/AdminNavBar';
+import LoadingAdminPage from '../../../components/Admin/PagesNoSSR/LoadingAdminPage';
 
 const products = () => {
   const allProducts = trpc.useQuery(['product.getProducts']);
@@ -31,6 +32,10 @@ const products = () => {
     return <UnauthorisedAdminPage />;
   }
   // page auth end
+
+  if (allProducts.isLoading) {
+    return <LoadingAdminPage />;
+  }
 
   return (
     <>
