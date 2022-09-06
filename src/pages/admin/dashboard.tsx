@@ -12,7 +12,7 @@ import {
 import Head from 'next/head';
 import { useSession } from 'next-auth/react';
 import { trpc } from '../../utils/trpc';
-import UnauthorisedAdminPage from '../../components/Admin/pages/UnauthorisedAdminPage';
+import UnauthorisedAdminPage from '../../components/Admin/Pages/UnauthorisedAdminPage';
 import Link from 'next/link';
 import AdminNavBar from '../../components/Admin/AdminNavBar';
 

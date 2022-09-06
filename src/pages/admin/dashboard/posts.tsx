@@ -3,11 +3,11 @@ import dynamic from 'next/dynamic';
 import { Box, Button, Center, Spinner, Stack } from '@chakra-ui/react';
 import Head from 'next/head';
 import Link from 'next/link';
-import UnauthorisedAdminPage from '../../../components/Admin/pages/UnauthorisedAdminPage';
+import UnauthorisedAdminPage from '../../../components/Admin/Pages/UnauthorisedAdminPage';
 import { trpc } from '../../../utils/trpc';
 import { useSession } from 'next-auth/react';
 import AdminNavBar from '../../../components/Admin/AdminNavBar';
-import LoadingAdminPage from '../../../components/Admin/pages/LoadingAdminPage';
+import LoadingAdminPage from '../../../components/Admin/Pages/LoadingAdminPage';
 
 const posts = () => {
   const allPosts = trpc.useQuery(['post.getPosts']);
