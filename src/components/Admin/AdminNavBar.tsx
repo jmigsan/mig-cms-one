@@ -74,7 +74,7 @@ export default function withAction() {
           <Flex alignItems={'center'}>
             <Link href={'/'}>
               <Button variant={'solid'} colorScheme={'blue'} size={'sm'} mr={4}>
-                Go Back To Homepage
+                Go Back To Public Website
               </Button>
             </Link>
             <Menu>
