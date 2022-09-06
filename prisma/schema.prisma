@@ -37,17 +37,18 @@ model Account {
     @@unique([provider, providerAccountId])
 }
 
+enum Role {
+    ADMIN
+    USER
+}
+
 model Session {
     id           String   @id @default(cuid())
     sessionToken String   @unique
     userId       String
     expires      DateTime
     user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-}
-
-enum Role {
-    ADMIN
-    USER
+    role Role?
 }
 
 model User {

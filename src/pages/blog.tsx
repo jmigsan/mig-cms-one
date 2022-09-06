@@ -9,6 +9,10 @@ import Link from 'next/link';
 const Blog: NextPage = () => {
   const allPosts = trpc.useQuery(['public.getPosts']);
 
+  if (allPosts.isLoading) {
+    return <div>Loading... (Fix this later)</div>;
+  }
+
   return (
     <>
       <Head>
@@ -16,7 +20,7 @@ const Blog: NextPage = () => {
         <meta name='description' content="Mig's CMS" />
         <link rel='icon' href='/favicon.ico' />
       </Head>
-      <Box>
+      <div>
         <NavBar />
         <Box p={3}>
           <Text>Blog</Text>
@@ -34,7 +38,7 @@ const Blog: NextPage = () => {
             ))}
           </Stack>
         </Box>
-      </Box>
+      </div>
     </>
   );
 };

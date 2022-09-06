@@ -9,7 +9,6 @@ import { appRouter } from '../../server/router';
 import { trpc } from '../../utils/trpc';
 import superjson from 'superjson';
 import { authOptions as nextAuthOptions } from '../api/auth/[...nextauth]';
-import { unstable_getServerSession } from 'next-auth/next';
 import DOMPurify from 'isomorphic-dompurify';
 
 const Post = (
@@ -36,13 +35,11 @@ const Post = (
             {data?.title}
           </Text>
           <Box>
-            {
-              <Box
-                dangerouslySetInnerHTML={{
-                  __html: DOMPurify.sanitize(data?.content!),
-                }}
-              />
-            }
+            <Box
+              dangerouslySetInnerHTML={{
+                __html: DOMPurify.sanitize(data?.content!),
+              }}
+            />
           </Box>
         </Container>
       </Box>
@@ -55,15 +52,10 @@ export default Post;
 export const getServerSideProps = async (
   context: GetServerSidePropsContext<{ post: string }>
 ) => {
-  const session: any = await unstable_getServerSession(
-    context.req,
-    context.res,
-    nextAuthOptions
-  );
-
   const ssg = await createSSGHelpers({
     router: appRouter,
-    ctx: await createContextInner(session),
+    // @ts-ignore. it hurts a bit that i do this.
+    ctx: null,
     transformer: superjson,
   });
 

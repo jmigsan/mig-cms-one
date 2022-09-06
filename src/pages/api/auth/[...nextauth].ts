@@ -13,6 +13,10 @@ export const authOptions: NextAuthOptions = {
       if (session.user) {
         session.user.id = user.id;
       }
+      if (session.user) {
+        // @ts-ignore. it hurts that i do this. why is everything crying.
+        session.user.role = user.role;
+      }
       return session;
     },
   },

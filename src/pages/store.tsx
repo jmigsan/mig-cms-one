@@ -9,6 +9,10 @@ import Link from 'next/link';
 const Store: NextPage = () => {
   const allProducts = trpc.useQuery(['public.getProducts']);
 
+  if (allProducts.isLoading) {
+    return <div>Loading... (Fix this later)</div>;
+  }
+
   return (
     <>
       <Head>

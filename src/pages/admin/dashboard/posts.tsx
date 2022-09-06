@@ -39,7 +39,7 @@ const posts = () => {
         <meta name='description' content="Mig's CMS" />
         <link rel='icon' href='/favicon.ico' />
       </Head>
-      <Box>
+      <div>
         <AdminNavBar />
         <Box p={3}>
           <Box pb={3}>
@@ -66,7 +66,7 @@ const posts = () => {
             ))}
           </Stack>
         </Box>
-      </Box>
+      </div>
     </>
   );
 };
