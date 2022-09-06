@@ -25,8 +25,9 @@ import UnauthorisedAdminPage from '../../../../components/Admin/Pages/Unauthoris
 import Head from 'next/head';
 import AdminNavBar from '../../../../components/Admin/AdminNavBar';
 import axios from 'axios';
+import DOMPurify from 'isomorphic-dompurify';
 
-const EditProduct = () => {
+const AddProduct = () => {
   // store product data
   const [title, setTitle] = useState('');
   const [publish, setPublish] = useState(false);
@@ -43,7 +44,7 @@ const EditProduct = () => {
 
   useEffect(() => {
     if (authorContainer.current) {
-      if (author === '') {
+      if (author === '' || author === undefined) {
         setAuthor(name.data as string);
       }
     }
@@ -86,9 +87,11 @@ const EditProduct = () => {
   const saveProduct = async () => {
     const datePublishDate = new Date(publishDate);
 
+    const sanitisedContent = DOMPurify.sanitize(content);
+
     let screenedContent = '';
 
-    if (content === '<p></p>') {
+    if (sanitisedContent === '<p></p>') {
       screenedContent = '';
     } else {
       screenedContent = content;
@@ -220,6 +223,7 @@ const EditProduct = () => {
                 onChange={(e) => setAuthor(e.target.value)}
                 value={author}
                 ref={authorContainer}
+                // defaultValue={name}
               />
             </Stack>
           </FormControl>
@@ -240,6 +244,6 @@ const EditProduct = () => {
   );
 };
 
-export default dynamic(() => Promise.resolve(EditProduct), {
+export default dynamic(() => Promise.resolve(AddProduct), {
   ssr: false,
 });

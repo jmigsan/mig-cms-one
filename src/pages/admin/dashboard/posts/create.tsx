@@ -24,8 +24,9 @@ import { useSession } from 'next-auth/react';
 import UnauthorisedAdminPage from '../../../../components/Admin/Pages/UnauthorisedAdminPage';
 import Head from 'next/head';
 import AdminNavBar from '../../../../components/Admin/AdminNavBar';
+import DOMPurify from 'isomorphic-dompurify';
 
-const EditPost = () => {
+const AddPost = () => {
   // store post data
   const [title, setTitle] = useState('');
   const [publish, setPublish] = useState(false);
@@ -42,7 +43,7 @@ const EditPost = () => {
 
   useEffect(() => {
     if (authorContainer.current) {
-      if (author === '') {
+      if (author === '' || author === undefined) {
         setAuthor(name.data as string);
       }
     }
@@ -85,9 +86,11 @@ const EditPost = () => {
   const savePost = async () => {
     const datePublishDate = new Date(publishDate);
 
+    const sanitisedContent = DOMPurify.sanitize(content);
+
     let screenedContent = '';
 
-    if (content === '<p></p>') {
+    if (sanitisedContent === '<p></p>') {
       screenedContent = '';
     } else {
       screenedContent = content;
@@ -195,6 +198,6 @@ const EditPost = () => {
   );
 };
 
-export default dynamic(() => Promise.resolve(EditPost), {
+export default dynamic(() => Promise.resolve(AddPost), {
   ssr: false,
 });
