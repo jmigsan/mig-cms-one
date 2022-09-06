@@ -31,8 +31,8 @@ const Blog: NextPage = () => {
                 <Box bg={'gray.200'} p={3} rounded={'lg'}>
                   <>
                     <Text fontSize={'2xl'}>{post.title}</Text>
-                    {post.publishDate?.toDateString}
-                    {post.author}
+                    <Text>{post.publishDate?.toDateString()}</Text>
+                    <Text>{post.author}</Text>
                   </>
                 </Box>
               </Link>

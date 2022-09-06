@@ -34,8 +34,8 @@ const Store: NextPage = () => {
                 <Box bg={'gray.200'} p={3} rounded={'lg'}>
                   <>
                     <Text fontSize={'2xl'}>{product.title}</Text>
-                    {product.publishDate?.toDateString}
-                    {product.author}
+                    <Text>{product.publishDate?.toDateString()}</Text>
+                    <Text>{product.author}</Text>
                   </>
                 </Box>
               </Link>
