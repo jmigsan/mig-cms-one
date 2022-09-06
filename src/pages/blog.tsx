@@ -1,10 +1,14 @@
-import { Box } from '@chakra-ui/react';
+import { Box, Stack, Text } from '@chakra-ui/react';
 import Head from 'next/head';
 import { NextPage } from 'next';
 
 import NavBar from '../components/All/NavBar';
+import { trpc } from '../utils/trpc';
+import Link from 'next/link';
 
 const Blog: NextPage = () => {
+  const allPosts = trpc.useQuery(['public.getPosts']);
+
   return (
     <>
       <Head>
@@ -14,7 +18,22 @@ const Blog: NextPage = () => {
       </Head>
       <Box>
         <NavBar />
-        blog
+        <Box p={3}>
+          <Text>Blog</Text>
+          <Stack>
+            {allPosts.data?.map((post) => (
+              <Link href={`/post/${post.postId}`} key={post.postId}>
+                <Box bg={'gray.200'} p={3} rounded={'lg'}>
+                  <>
+                    <Text fontSize={'2xl'}>{post.title}</Text>
+                    {post.publishDate?.toDateString}
+                    {post.author}
+                  </>
+                </Box>
+              </Link>
+            ))}
+          </Stack>
+        </Box>
       </Box>
     </>
   );

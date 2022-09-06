@@ -1,30 +1,81 @@
-import { Box, Text } from '@chakra-ui/react';
+import { Box, Container, Text } from '@chakra-ui/react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import NavBar from '../../components/All/NavBar';
+import { createSSGHelpers } from '@trpc/react/ssg';
+import { GetServerSidePropsContext, InferGetServerSidePropsType } from 'next';
+import { createContextInner } from '../../server/router/context';
+import { appRouter } from '../../server/router';
+import { trpc } from '../../utils/trpc';
+import superjson from 'superjson';
+import { authOptions as nextAuthOptions } from '../api/auth/[...nextauth]';
+import { unstable_getServerSession } from 'next-auth/next';
+import DOMPurify from 'isomorphic-dompurify';
 
-const Post = () => {
+const Post = (
+  props: InferGetServerSidePropsType<typeof getServerSideProps>
+) => {
   const router = useRouter();
   const { post } = router.query;
+  const { data } = trpc.useQuery([
+    'public.getPost',
+    { postId: post as string },
+  ]);
 
   return (
     <>
       <Head>
-        <title>MigMS Blog - {post}</title>
+        <title>MigMS Blog - {data?.title}</title>
         <meta name='description' content="Mig's CMS" />
         <link rel='icon' href='/favicon.ico' />
       </Head>
       <Box>
         <NavBar />
-        <Box p={3}>
+        <Container p={3}>
           <Text fontSize={'2xl'} fontWeight={'bold'}>
-            {post}
+            {data?.title}
           </Text>
-          <Text>yo</Text>
-        </Box>
+          <Box>
+            {
+              <Box
+                dangerouslySetInnerHTML={{
+                  __html: DOMPurify.sanitize(data?.content!),
+                }}
+              />
+            }
+          </Box>
+        </Container>
       </Box>
     </>
   );
 };
 
 export default Post;
+
+export const getServerSideProps = async (
+  context: GetServerSidePropsContext<{ post: string }>
+) => {
+  const session: any = await unstable_getServerSession(
+    context.req,
+    context.res,
+    nextAuthOptions
+  );
+
+  const ssg = await createSSGHelpers({
+    router: appRouter,
+    ctx: await createContextInner(session),
+    transformer: superjson,
+  });
+
+  const id = context.params?.post as string;
+
+  await ssg.prefetchQuery('public.getPost', {
+    postId: id,
+  });
+
+  return {
+    props: {
+      trpcState: ssg.dehydrate(),
+    },
+  };
+};
