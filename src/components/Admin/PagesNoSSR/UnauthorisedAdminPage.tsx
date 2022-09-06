@@ -1,4 +1,4 @@
-import { Box, Center, Link as ChakraLink, Stack, Text } from '@chakra-ui/react';
+import { Box, Center, Stack, Text } from '@chakra-ui/react';
 import Head from 'next/head';
 import Link from 'next/link';
 
@@ -17,10 +17,10 @@ const UnauthorisedAdminPage = () => {
           </Center>
           <Center>
             <Text>
-              Please
+              Please{' '}
               <Text color={'blue'} as={'span'}>
                 <Link href={'/admin'}>sign in</Link>
-              </Text>
+              </Text>{' '}
               as an administrator to access this page.
             </Text>
           </Center>
