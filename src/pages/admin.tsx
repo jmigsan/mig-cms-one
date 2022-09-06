@@ -16,14 +16,8 @@ import { ArrowBackIcon } from '@chakra-ui/icons';
 import { useEffect, useState } from 'react';
 
 const Admin: NextPage = () => {
-  const utils = trpc.useContext();
-  const role = trpc.useQuery(['user.getRole']);
-
   const { data: session } = useSession();
-
-  useEffect(() => {
-    utils.invalidateQueries(['user.getRole']);
-  }, [session]);
+  const role = session?.user?.role;
 
   return (
     <>
@@ -38,9 +32,9 @@ const Admin: NextPage = () => {
             <Box p={5} rounded={'lg'} bg={'green.200'}>
               <Stack>
                 <Text>Welcome to the Admin Panel</Text>
-                {role.data && <Text>Role: {role.data}</Text>}
-                {session && !role.data && <Text>Loading...</Text>}
-                {role.data === 'ADMIN' && (
+                {role && <Text>Role: {role}</Text>}
+                {session && !role && <Text>Loading...</Text>}
+                {role === 'ADMIN' && (
                   <Link href='/admin/dashboard'>
                     <Button>Continue to admin panel</Button>
                   </Link>

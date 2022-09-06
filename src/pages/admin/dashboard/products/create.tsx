@@ -138,14 +138,14 @@ const EditProduct = () => {
   };
 
   // page auth begin
-  const role = trpc.useQuery(['user.getRole']);
   const { data: session } = useSession();
+  const role = session?.user?.role;
 
   if (!session) {
     return <UnauthorisedAdminPage />;
   }
 
-  if (!role.data) {
+  if (!role) {
     return (
       <Center pt={6}>
         <Spinner />
@@ -153,7 +153,7 @@ const EditProduct = () => {
     );
   }
 
-  if (role.data !== 'ADMIN') {
+  if (role !== 'ADMIN') {
     return <UnauthorisedAdminPage />;
   }
   // page auth end

@@ -44,12 +44,7 @@ export const productRouter = createProtectedRouter()
         throw new Error('please sign in');
       }
 
-      const userRole = await ctx.prisma.user.findFirst({
-        where: { id: ctx.session.user.id },
-        select: { role: true },
-      });
-
-      if (userRole?.role !== 'ADMIN') {
+      if (ctx.session.user.role !== 'ADMIN') {
         throw new Error('you are not authorised');
       }
       // authorisation end
@@ -82,12 +77,7 @@ export const productRouter = createProtectedRouter()
         throw new Error('please sign in');
       }
 
-      const userRole = await ctx.prisma.user.findFirst({
-        where: { id: ctx.session.user.id },
-        select: { role: true },
-      });
-
-      if (userRole?.role !== 'ADMIN') {
+      if (ctx.session.user.role !== 'ADMIN') {
         throw new Error('you are not authorised');
       }
       // authorisation end
