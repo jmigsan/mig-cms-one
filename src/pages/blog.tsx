@@ -5,12 +5,13 @@ import { NextPage } from 'next';
 import NavBar from '../components/All/NavBar';
 import { trpc } from '../utils/trpc';
 import Link from 'next/link';
+import LoadingPage from '../components/All/Pages/LoadingPage';
 
 const Blog: NextPage = () => {
   const allPosts = trpc.useQuery(['public.getPosts']);
 
   if (allPosts.isLoading) {
-    return <div>Loading... (Fix this later)</div>;
+    return <LoadingPage />;
   }
 
   return (

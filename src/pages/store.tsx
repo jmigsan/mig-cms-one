@@ -5,12 +5,13 @@ import { NextPage } from 'next';
 import NavBar from '../components/All/NavBar';
 import { trpc } from '../utils/trpc';
 import Link from 'next/link';
+import LoadingPage from '../components/All/Pages/LoadingPage';
 
 const Store: NextPage = () => {
   const allProducts = trpc.useQuery(['public.getProducts']);
 
   if (allProducts.isLoading) {
-    return <div>Loading... (Fix this later)</div>;
+    return <LoadingPage />;
   }
 
   return (
