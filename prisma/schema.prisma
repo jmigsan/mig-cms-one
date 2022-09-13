@@ -48,7 +48,7 @@ model Session {
     userId       String
     expires      DateTime
     user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-    role Role?
+    role         Role?
 }
 
 model User {
@@ -72,19 +72,28 @@ model VerificationToken {
 }
 
 model Post {
-    postId String  @id @default(cuid())
-    title String
-    published Boolean @default(false)
-    content String
+    postId      String    @id @default(cuid())
+    title       String
+    published   Boolean   @default(false)
+    content     String
     publishDate DateTime?
-    author String
+    author      String
 }
 
 model Product {
-    productId String  @id @default(cuid())
-    title String
-    published Boolean @default(false)
-    content String
+    productId   String         @id @default(cuid())
+    title       String
+    published   Boolean        @default(false)
+    content     String
     publishDate DateTime?
-    author String
+    author      String
+    images      ProductImage[]
+}
+
+model ProductImage {
+    id               String   @id @default(cuid())
+    alt              String   @default("")
+    imageKey         String
+    Product          Product? @relation(fields: [productProductId], references: [productId])
+    productProductId String?
 }

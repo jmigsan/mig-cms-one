@@ -67,6 +67,7 @@ const EditPost = () => {
       });
     },
     onError: () => {
+      toast.closeAll();
       toast({
         title: 'Post failed',
         status: 'error',

@@ -68,6 +68,7 @@ const EditProduct = () => {
       });
     },
     onError: () => {
+      toast.closeAll();
       toast({
         title: 'Product failed',
         status: 'error',

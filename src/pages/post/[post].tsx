@@ -10,6 +10,7 @@ import { trpc } from '../../utils/trpc';
 import superjson from 'superjson';
 import { authOptions as nextAuthOptions } from '../api/auth/[...nextauth]';
 import DOMPurify from 'isomorphic-dompurify';
+import { unstable_getServerSession, Session } from 'next-auth';
 
 const Post = (
   props: InferGetServerSidePropsType<typeof getServerSideProps>

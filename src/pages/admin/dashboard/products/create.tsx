@@ -15,7 +15,7 @@ import {
   Spinner,
   Box,
 } from '@chakra-ui/react';
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { trpc } from '../../../../utils/trpc';
 import TipTap from '../../../../components/Admin/TipTap';
 import Link from 'next/link';
@@ -34,21 +34,12 @@ const AddProduct = () => {
   const [content, setContent] = useState('');
   const [publishDate, setPublishDate] = useState('');
   const [author, setAuthor] = useState('');
+  const [fileKey, setFileKey] = useState(null);
 
   // get name
   const name = trpc.useQuery(['user.getName'], {
     refetchOnWindowFocus: false,
   });
-
-  const authorContainer = useRef(null);
-
-  useEffect(() => {
-    if (authorContainer.current) {
-      if (author === '' || author === undefined) {
-        setAuthor(name.data as string);
-      }
-    }
-  }, [name]);
 
   // upload to postgres
   const utils = trpc.useContext();
@@ -63,6 +54,7 @@ const AddProduct = () => {
       });
     },
     onError: () => {
+      toast.closeAll();
       toast({
         title: 'Product failed',
         status: 'error',
@@ -111,6 +103,7 @@ const AddProduct = () => {
 
   // upload to s3
   const getSignedPut = trpc.useMutation(['b2.getSignedPut']);
+  // const imageKeyToDB = trpc.useMutation(['product.imageKeyToDB']);
 
   const [file, setFile] = useState<File>();
 
@@ -120,14 +113,12 @@ const AddProduct = () => {
     }
 
     const fileType = encodeURIComponent(file.type);
-    console.log(fileType);
 
     const signedUrl = await getSignedPut.mutateAsync({ fileType: fileType });
-    console.log(signedUrl);
 
     await axios.put(signedUrl.uploadUrl, file);
 
-    return signedUrl.key;
+    // await imageKeyToDB.mutate({ imageKey: signedUrl.key });
   };
 
   // reset file
@@ -221,9 +212,7 @@ const AddProduct = () => {
               <FormLabel>Author</FormLabel>
               <Input
                 onChange={(e) => setAuthor(e.target.value)}
-                value={author}
-                ref={authorContainer}
-                // defaultValue={name}
+                defaultValue={name.data as string}
               />
             </Stack>
           </FormControl>

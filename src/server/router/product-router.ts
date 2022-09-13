@@ -96,3 +96,18 @@ export const productRouter = createProtectedRouter()
       });
     },
   });
+// .mutation('imageKeyToDB', {
+//   input: z.object({
+//     imageKey: z.string(),
+//   }),
+//   async resolve({ ctx, input }) {
+//     return await ctx.prisma.productImage.create({
+//       data: {
+//         imageKey: input.imageKey,
+//         Product: {
+//           connect: { productId: }
+//         }
+//       }
+//     })
+//   },
+// });

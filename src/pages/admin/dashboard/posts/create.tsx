@@ -15,7 +15,7 @@ import {
   Spinner,
   Box,
 } from '@chakra-ui/react';
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { trpc } from '../../../../utils/trpc';
 import TipTap from '../../../../components/Admin/TipTap';
 import Link from 'next/link';
@@ -39,16 +39,6 @@ const AddPost = () => {
     refetchOnWindowFocus: false,
   });
 
-  const authorContainer = useRef(null);
-
-  useEffect(() => {
-    if (authorContainer.current) {
-      if (author === '' || author === undefined) {
-        setAuthor(name.data as string);
-      }
-    }
-  }, [name]);
-
   // upload to postgres
   const utils = trpc.useContext();
   const router = useRouter();
@@ -62,6 +52,7 @@ const AddPost = () => {
       });
     },
     onError: () => {
+      toast.closeAll();
       toast({
         title: 'Post failed',
         status: 'error',
@@ -176,8 +167,7 @@ const AddPost = () => {
               <FormLabel>Author</FormLabel>
               <Input
                 onChange={(e) => setAuthor(e.target.value)}
-                value={author}
-                ref={authorContainer}
+                defaultValue={name.data as string}
               />
             </Stack>
           </FormControl>
