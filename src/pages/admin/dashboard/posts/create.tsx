@@ -21,7 +21,7 @@ import TipTap from '../../../../components/Admin/TipTap';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useSession } from 'next-auth/react';
-import UnauthorisedAdminPage from '../../../../components/Admin/pages/UnauthorisedAdminPage';
+import UnauthorisedAdminPage from '../../../../components/Admin/Pages/UnauthorisedAdminPage';
 import Head from 'next/head';
 import AdminNavBar from '../../../../components/Admin/AdminNavBar';
 import DOMPurify from 'isomorphic-dompurify';
