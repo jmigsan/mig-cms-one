@@ -21,6 +21,7 @@ import {
 } from 'react-icons/md';
 import { Editor, EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
+import B2ImageUpload from './B2ImageUpload';
 
 const MenuBar = ({ editor }: { editor: Editor | null }) => {
   if (!editor) {
@@ -128,6 +129,10 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
       {/* redo */}
       <Button onClick={() => editor.chain().focus().redo().run()}>
         <MdRedo />
+      </Button>
+      {/* image uploading */}
+      <Button onClick={() => editor.chain().focus().redo().run()}>
+        <B2ImageUpload />
       </Button>
     </SimpleGrid>
   );
