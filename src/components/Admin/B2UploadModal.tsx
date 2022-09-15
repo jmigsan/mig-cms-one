@@ -72,6 +72,8 @@ const B2ImageUpload = () => {
     await axios.put(signedUrl.uploadUrl, file);
 
     await imageToDB.mutate({ imageKey: signedUrl.key });
+
+    resetFile();
   };
 
   // reset file
@@ -104,6 +106,7 @@ const B2ImageUpload = () => {
               <SimpleGrid columns={4} spacing={2}>
                 {dbImages.data?.map((image) => (
                   <Image
+                    key={image.imageKey}
                     src={`https://f004.backblazeb2.com/file/mig-cms-one/${image.imageKey}`}
                   />
                 ))}
@@ -118,7 +121,7 @@ const B2ImageUpload = () => {
               />
               <HStack>
                 <Button onClick={() => uploadFile()}>Upload File</Button>
-                <Button onClick={() => resetFile()}>Reset File</Button>
+                {/* <Button onClick={() => resetFile()}>Reset File</Button> */}
               </HStack>
             </Stack>
           </ModalBody>

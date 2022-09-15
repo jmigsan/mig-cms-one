@@ -131,9 +131,7 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
         <MdRedo />
       </Button>
       {/* image uploading */}
-      <Button onClick={() => editor.chain().focus().redo().run()}>
-        <B2UploadModal />
-      </Button>
+      <B2UploadModal />
     </SimpleGrid>
   );
 };
