@@ -12,6 +12,9 @@ import {
   HStack,
   Stack,
   Text,
+  SimpleGrid,
+  Image,
+  useToast,
 } from '@chakra-ui/react';
 import axios from 'axios';
 import { useRef, useState } from 'react';
@@ -22,9 +25,39 @@ const B2ImageUpload = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   // upload to s3
+  const toast = useToast();
+  const utils = trpc.useContext();
   const getSignedPut = trpc.useMutation(['b2.getSignedPut']);
-  // const imageKeyToDB = trpc.useMutation(['product.imageKeyToDB']);
-
+  const imageToDB = trpc.useMutation(['image.imageToDB'], {
+    onMutate: () => {
+      toast({
+        title: 'Image uploading',
+        description: 'Please wait',
+        status: 'loading',
+        duration: 100000,
+      });
+    },
+    onError: () => {
+      toast.closeAll();
+      toast({
+        title: 'Image failed',
+        status: 'error',
+        duration: 7000,
+        isClosable: true,
+      });
+    },
+    onSettled: () => {
+      utils.invalidateQueries(['image.getImages']);
+      toast.closeAll();
+      toast({
+        title: 'Image uploaded',
+        description: 'Successfully uploaded an image',
+        status: 'success',
+        duration: 7000,
+        isClosable: true,
+      });
+    },
+  });
   const [file, setFile] = useState<File>();
 
   const uploadFile = async () => {
@@ -38,7 +71,7 @@ const B2ImageUpload = () => {
 
     await axios.put(signedUrl.uploadUrl, file);
 
-    // await imageKeyToDB.mutate({ imageKey: signedUrl.key });
+    await imageToDB.mutate({ imageKey: signedUrl.key });
   };
 
   // reset file
@@ -50,6 +83,9 @@ const B2ImageUpload = () => {
       inputRef.current.value = '';
     }
   };
+
+  // get db images
+  const dbImages = trpc.useQuery(['image.getImages']);
 
   return (
     <>
@@ -65,6 +101,13 @@ const B2ImageUpload = () => {
           <ModalBody>
             <Stack>
               <Text fontSize={'2xl'}>Uploaded Images</Text>
+              <SimpleGrid columns={4} spacing={2}>
+                {dbImages.data?.map((image) => (
+                  <Image
+                    src={`https://f004.backblazeb2.com/file/mig-cms-one/${image.imageKey}`}
+                  />
+                ))}
+              </SimpleGrid>
               <Text fontSize={'2xl'}>Upload an Image</Text>
               <Input
                 type={'file'}

@@ -21,7 +21,7 @@ import TipTap from '../../../../components/Admin/TipTap';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useSession } from 'next-auth/react';
-import UnauthorisedAdminPage from '../../../../components/Admin/Pages/UnauthorisedAdminPage';
+import UnauthorisedAdminPage from '../../../../components/Admin/pages/UnauthorisedAdminPage';
 import Head from 'next/head';
 import AdminNavBar from '../../../../components/Admin/AdminNavBar';
 import axios from 'axios';
@@ -57,6 +57,7 @@ const EditProduct = () => {
   }, [post]);
 
   // upload to postgres
+  const toast = useToast();
   const utils = trpc.useContext();
   const updateProductMutation = trpc.useMutation(['product.updateProduct'], {
     onMutate: () => {
@@ -89,7 +90,6 @@ const EditProduct = () => {
       });
     },
   });
-  const toast = useToast();
 
   const saveProduct = async () => {
     const datePublishDate = new Date(publishDate);

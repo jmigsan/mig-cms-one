@@ -9,6 +9,7 @@ import { postRouter } from './post-router';
 import { productRouter } from './product-router';
 import { b2Router } from './b2-router';
 import { publicRouter } from './public-router';
+import { imageRouter } from './image-router';
 
 export const appRouter = createRouter()
   .transformer(superjson)
@@ -18,7 +19,8 @@ export const appRouter = createRouter()
   .merge('post.', postRouter)
   .merge('product.', productRouter)
   .merge('b2.', b2Router)
-  .merge('public.', publicRouter);
+  .merge('public.', publicRouter)
+  .merge('image.', imageRouter);
 
 // export type definition of API
 export type AppRouter = typeof appRouter;

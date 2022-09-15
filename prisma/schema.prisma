@@ -81,19 +81,18 @@ model Post {
 }
 
 model Product {
-    productId   String         @id @default(cuid())
+    productId   String    @id @default(cuid())
     title       String
-    published   Boolean        @default(false)
+    published   Boolean   @default(false)
     content     String
     publishDate DateTime?
     author      String
-    images      ProductImage[]
+    coverImages Image[]
 }
 
-model ProductImage {
-    id               String   @id @default(cuid())
+model Image {
+    imageKey         String   @id
     alt              String   @default("")
-    imageKey         String
-    Product          Product? @relation(fields: [productProductId], references: [productId])
+    product          Product? @relation(fields: [productProductId], references: [productId])
     productProductId String?
 }
