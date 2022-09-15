@@ -10,7 +10,7 @@ import { trpc } from '../../utils/trpc';
 import superjson from 'superjson';
 import { authOptions as nextAuthOptions } from '../api/auth/[...nextauth]';
 import DOMPurify from 'isomorphic-dompurify';
-import { unstable_getServerSession, Session } from 'next-auth';
+import { unstable_getServerSession } from 'next-auth/next';
 
 const Post = (
   props: InferGetServerSidePropsType<typeof getServerSideProps>
@@ -53,10 +53,15 @@ export default Post;
 export const getServerSideProps = async (
   context: GetServerSidePropsContext<{ post: string }>
 ) => {
+  const session = await unstable_getServerSession(
+    context.req,
+    context.res,
+    nextAuthOptions
+  );
+
   const ssg = await createSSGHelpers({
     router: appRouter,
-    // @ts-ignore. it hurts a bit that i do this.
-    ctx: null,
+    ctx: await createContextInner({ session: session }),
     transformer: superjson,
   });
 
