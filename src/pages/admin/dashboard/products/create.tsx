@@ -14,6 +14,7 @@ import {
   useToast,
   Spinner,
   Box,
+  Image,
 } from '@chakra-ui/react';
 import { useRef, useState } from 'react';
 import { trpc } from '../../../../utils/trpc';
@@ -26,6 +27,7 @@ import Head from 'next/head';
 import AdminNavBar from '../../../../components/Admin/AdminNavBar';
 import axios from 'axios';
 import DOMPurify from 'isomorphic-dompurify';
+import B2UploadGalleryModal from '../../../../components/Admin/B2UploadGalleryModal';
 
 const AddProduct = () => {
   // store product data
@@ -34,7 +36,7 @@ const AddProduct = () => {
   const [content, setContent] = useState('');
   const [publishDate, setPublishDate] = useState('');
   const [author, setAuthor] = useState('');
-  const [fileKey, setFileKey] = useState(null);
+  const [imageArr, setImageArr] = useState<string[]>([]);
 
   // get name
   const name = trpc.useQuery(['user.getName'], {
@@ -101,36 +103,6 @@ const AddProduct = () => {
     utils.invalidateQueries(['product.getProducts']);
   };
 
-  // upload to s3
-  const getSignedPut = trpc.useMutation(['b2.getSignedPut']);
-  // const imageKeyToDB = trpc.useMutation(['product.imageKeyToDB']);
-
-  const [file, setFile] = useState<File>();
-
-  const uploadFile = async () => {
-    if (!file) {
-      return null;
-    }
-
-    const fileType = encodeURIComponent(file.type);
-
-    const signedUrl = await getSignedPut.mutateAsync({ fileType: fileType });
-
-    await axios.put(signedUrl.uploadUrl, file);
-
-    // await imageKeyToDB.mutate({ imageKey: signedUrl.key });
-  };
-
-  // reset file
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  const resetFile = () => {
-    if (inputRef.current !== null) {
-      setFile(undefined);
-      inputRef.current.value = '';
-    }
-  };
-
   // page auth begin
   const { data: session } = useSession();
   const role = session?.user?.role;
@@ -182,17 +154,17 @@ const AddProduct = () => {
               </HStack>
 
               <FormLabel>Image</FormLabel>
-              <Input
-                type={'file'}
-                accept={'image/jpeg, image/png'}
-                ref={inputRef}
-                onChange={(e) => setFile(e.target.files?.[0] || undefined)}
-                variant={'unstyled'}
+              <B2UploadGalleryModal
+                setImageArr={setImageArr}
+                imageArr={imageArr}
               />
-              <HStack>
-                <Button onClick={() => uploadFile()}>Upload File</Button>
-                <Button onClick={() => resetFile()}>Reset File</Button>
-              </HStack>
+              {imageArr.length === 0 && <div>oi</div>}
+              {imageArr.length > 0 &&
+                imageArr.map((image) => (
+                  <Box rounded={'lg'} key={image}>
+                    <Image src={image} />
+                  </Box>
+                ))}
 
               <FormLabel>Content</FormLabel>
 
