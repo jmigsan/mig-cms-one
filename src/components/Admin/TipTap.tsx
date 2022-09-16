@@ -21,7 +21,8 @@ import {
 } from 'react-icons/md';
 import { Editor, EditorContent, useEditor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
-import B2UploadModal from './B2UploadModal';
+import Image from '@tiptap/extension-image';
+import B2UploadTipTapModal from './B2UploadTipTapModal';
 
 const MenuBar = ({ editor }: { editor: Editor | null }) => {
   if (!editor) {
@@ -131,7 +132,7 @@ const MenuBar = ({ editor }: { editor: Editor | null }) => {
         <MdRedo />
       </Button>
       {/* image uploading */}
-      <B2UploadModal />
+      <B2UploadTipTapModal editor={editor} />
     </SimpleGrid>
   );
 };
@@ -148,7 +149,7 @@ const TipTap: React.FC<{
   }
 
   const editor = useEditor({
-    extensions: [StarterKit],
+    extensions: [StarterKit, Image],
     onUpdate: ({ editor }) => {
       setContent(editor.getHTML());
     },

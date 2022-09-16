@@ -18,10 +18,15 @@ import {
 } from '@chakra-ui/react';
 import axios from 'axios';
 import { useRef, useState } from 'react';
-import { MdImage } from 'react-icons/md';
 import { trpc } from '../../utils/trpc';
 
-const B2ImageUpload = () => {
+const B2ImageUpload = ({
+  setImageArr,
+  imageArr,
+}: {
+  setImageArr: React.Dispatch<React.SetStateAction<string[]>>;
+  imageArr: string[];
+}) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   // upload to s3
@@ -89,11 +94,16 @@ const B2ImageUpload = () => {
   // get db images
   const dbImages = trpc.useQuery(['image.getImages']);
 
+  const addImage = ({ imageKey }: { imageKey: string }) => {
+    setImageArr([
+      ...imageArr,
+      `https://f004.backblazeb2.com/file/mig-cms-one/${imageKey}`,
+    ]);
+  };
+
   return (
     <>
-      <Button onClick={onOpen}>
-        <MdImage />
-      </Button>
+      <Button onClick={onOpen}>Upload Image</Button>
 
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
@@ -105,10 +115,14 @@ const B2ImageUpload = () => {
               <Text fontSize={'2xl'}>Uploaded Images</Text>
               <SimpleGrid columns={4} spacing={2}>
                 {dbImages.data?.map((image) => (
-                  <Image
+                  <Button
                     key={image.imageKey}
-                    src={`https://f004.backblazeb2.com/file/mig-cms-one/${image.imageKey}`}
-                  />
+                    onClick={() => addImage({ imageKey: image.imageKey })}
+                  >
+                    <Image
+                      src={`https://f004.backblazeb2.com/file/mig-cms-one/${image.imageKey}`}
+                    />
+                  </Button>
                 ))}
               </SimpleGrid>
               <Text fontSize={'2xl'}>Upload an Image</Text>
