@@ -94,6 +94,7 @@ const B2ImageUpload = ({
   // get db images
   const dbImages = trpc.useQuery(['image.getImages']);
 
+  // add image to setImageArr
   const addImage = ({ imageKey }: { imageKey: string }) => {
     setImageArr([
       ...imageArr,
