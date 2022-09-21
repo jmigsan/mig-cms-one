@@ -15,6 +15,7 @@ import {
   SimpleGrid,
   Image,
   useToast,
+  Box,
 } from '@chakra-ui/react';
 import axios from 'axios';
 import { useRef, useState } from 'react';
@@ -102,6 +103,12 @@ const B2ImageUpload = ({
     ]);
   };
 
+  //del image from postgres DB
+  const delImageFromDB = trpc.useMutation(['image.delImageFromDB']);
+  const delImage = ({ imageKey }: { imageKey: string }) => {
+    delImageFromDB.mutate({ imageKey });
+  };
+
   return (
     <>
       <Button onClick={onOpen}>Upload Image</Button>
@@ -116,14 +123,20 @@ const B2ImageUpload = ({
               <Text fontSize={'2xl'}>Uploaded Images</Text>
               <SimpleGrid columns={4} spacing={2}>
                 {dbImages.data?.map((image) => (
-                  <Button
-                    key={image.imageKey}
-                    onClick={() => addImage({ imageKey: image.imageKey })}
-                  >
-                    <Image
-                      src={`https://f004.backblazeb2.com/file/mig-cms-one/${image.imageKey}`}
-                    />
-                  </Button>
+                  <Box key={image.imageKey}>
+                    <Button
+                      onClick={() => addImage({ imageKey: image.imageKey })}
+                    >
+                      <Image
+                        src={`https://f004.backblazeb2.com/file/mig-cms-one/${image.imageKey}`}
+                      />
+                    </Button>
+                    <Button
+                      onClick={() => delImage({ imageKey: image.imageKey })}
+                    >
+                      Delete Image From Database
+                    </Button>
+                  </Box>
                 ))}
               </SimpleGrid>
               <Text fontSize={'2xl'}>Upload an Image</Text>

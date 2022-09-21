@@ -97,10 +97,17 @@ const AddProduct = () => {
       content: screenedContent,
       publishDate: datePublishDate,
       author,
+      coverImages: imageArr,
     });
 
     router.push('/admin/dashboard/products');
     utils.invalidateQueries(['product.getProducts']);
+  };
+
+  // removes image from string array
+  const removeFromGallery = ({ imageURL }: { imageURL: string }) => {
+    const newImageArr = imageArr.filter((x) => x !== imageURL);
+    setImageArr(newImageArr);
   };
 
   // page auth begin
@@ -158,11 +165,16 @@ const AddProduct = () => {
                 setImageArr={setImageArr}
                 imageArr={imageArr}
               />
-              {imageArr.length === 0 && <div>oi</div>}
+              {imageArr.length === 0 && (
+                <Text>No images. Upload an Image!</Text>
+              )}
               {imageArr.length > 0 &&
-                imageArr.map((image) => (
-                  <Box rounded={'lg'} key={image}>
-                    <Image src={image} />
+                imageArr.map((imageURL) => (
+                  <Box rounded={'lg'} key={imageURL} maxW={'md'}>
+                    <Image src={imageURL} />
+                    <Button onClick={() => removeFromGallery({ imageURL })}>
+                      Remove from product gallery
+                    </Button>
                   </Box>
                 ))}
 

@@ -87,12 +87,10 @@ model Product {
     content     String
     publishDate DateTime?
     author      String
-    coverImages Image[]
+    coverImages String[]
 }
 
 model Image {
-    imageKey         String   @id
-    alt              String   @default("")
-    product          Product? @relation(fields: [productProductId], references: [productId])
-    productProductId String?
+    imageKey String @id
+    alt      String @default("")
 }

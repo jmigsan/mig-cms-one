@@ -36,6 +36,7 @@ export const productRouter = createProtectedRouter()
         content: z.string(),
         publishDate: z.date().nullish(),
         author: z.string().nullish(),
+        coverImages: z.string().array().nullish(),
       })
       .nullish(),
     async resolve({ ctx, input }) {
@@ -56,6 +57,7 @@ export const productRouter = createProtectedRouter()
           content: input?.content || '<p>no content</p>',
           publishDate: input?.publishDate,
           author: input?.author || 'Anonymous',
+          coverImages: input?.coverImages || [],
         },
       });
     },
@@ -69,6 +71,7 @@ export const productRouter = createProtectedRouter()
         content: z.string(),
         publishDate: z.date().nullish(),
         author: z.string().nullish(),
+        coverImages: z.string().array().nullish(),
       })
       .nullish(),
     async resolve({ ctx, input }) {
@@ -92,6 +95,7 @@ export const productRouter = createProtectedRouter()
           content: input?.content || '<p>no content</p>',
           publishDate: input?.publishDate,
           author: input?.author || 'Anonymous',
+          coverImages: input?.coverImages || [],
         },
       });
     },

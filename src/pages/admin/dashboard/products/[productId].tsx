@@ -14,6 +14,7 @@ import {
   useToast,
   Spinner,
   Box,
+  Image,
 } from '@chakra-ui/react';
 import { useEffect, useRef, useState } from 'react';
 import { trpc } from '../../../../utils/trpc';
@@ -25,6 +26,7 @@ import UnauthorisedAdminPage from '../../../../components/Admin/Pages/Unauthoris
 import Head from 'next/head';
 import AdminNavBar from '../../../../components/Admin/AdminNavBar';
 import axios from 'axios';
+import B2UploadGalleryModal from '../../../../components/Admin/B2UploadGalleryModal';
 
 const EditProduct = () => {
   // get product data
@@ -38,6 +40,7 @@ const EditProduct = () => {
   const [content, setContent] = useState('');
   const [publishDate, setPublishDate] = useState('');
   const [author, setAuthor] = useState('');
+  const [imageArr, setImageArr] = useState<string[]>([]);
 
   // set default product data
   const titleContainer = useRef(null);
@@ -109,41 +112,17 @@ const EditProduct = () => {
       content: screenedContent,
       publishDate: datePublishDate,
       author,
+      coverImages: imageArr,
     });
 
     router.push('/admin/dashboard/products');
     utils.invalidateQueries(['product.getProducts']);
   };
 
-  // upload to s3
-  const getSignedPut = trpc.useMutation(['b2.getSignedPut']);
-
-  const [file, setFile] = useState<File>();
-
-  const uploadFile = async () => {
-    if (!file) {
-      return null;
-    }
-
-    const fileType = encodeURIComponent(file.type);
-    console.log(fileType);
-
-    const signedUrl = await getSignedPut.mutateAsync({ fileType: fileType });
-    console.log(signedUrl);
-
-    await axios.put(signedUrl.uploadUrl, file);
-
-    return signedUrl.key;
-  };
-
-  // reset file
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  const resetFile = () => {
-    if (inputRef.current !== null) {
-      setFile(undefined);
-      inputRef.current.value = '';
-    }
+  // removes image from string array
+  const removeFromGallery = ({ imageURL }: { imageURL: string }) => {
+    const newImageArr = imageArr.filter((x) => x !== imageURL);
+    setImageArr(newImageArr);
   };
 
   // page auth begin
@@ -209,17 +188,22 @@ const EditProduct = () => {
               </HStack>
 
               <FormLabel>Image</FormLabel>
-              <Input
-                type={'file'}
-                accept={'image/jpeg, image/png'}
-                ref={inputRef}
-                onChange={(e) => setFile(e.target.files?.[0] || undefined)}
-                variant={'unstyled'}
+              <B2UploadGalleryModal
+                setImageArr={setImageArr}
+                imageArr={imageArr}
               />
-              <HStack>
-                <Button onClick={() => uploadFile()}>Upload File</Button>
-                <Button onClick={() => resetFile()}>Reset File</Button>
-              </HStack>
+              {imageArr.length === 0 && (
+                <Text>No images. Upload an Image!</Text>
+              )}
+              {imageArr.length > 0 &&
+                imageArr.map((imageURL) => (
+                  <Box rounded={'lg'} key={imageURL} maxW={'md'}>
+                    <Image src={imageURL} />
+                    <Button onClick={() => removeFromGallery({ imageURL })}>
+                      Remove from product gallery
+                    </Button>
+                  </Box>
+                ))}
 
               <FormLabel>Content</FormLabel>
 
