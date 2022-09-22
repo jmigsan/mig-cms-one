@@ -1,4 +1,4 @@
-import { Box, Container, Text } from '@chakra-ui/react';
+import { Box, Container, Text, Image } from '@chakra-ui/react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import NavBar from '../../components/All/NavBar';
@@ -36,6 +36,15 @@ const Post = (
             {data?.title}
           </Text>
           <Box>
+            {data?.coverImages.length > 0 &&
+              data.coverImages.map((imageURL) => (
+                <Image
+                  src={imageURL}
+                  rounded={'xl'}
+                  key={imageURL}
+                  maxW={'md'}
+                />
+              ))}
             <Box
               dangerouslySetInnerHTML={{
                 __html: DOMPurify.sanitize(data?.content!),
