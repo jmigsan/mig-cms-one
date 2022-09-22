@@ -55,6 +55,7 @@ const EditProduct = () => {
           post.data?.publishDate?.toISOString().substring(0, 10) as string
         );
         setAuthor(post.data?.author as string);
+        setImageArr(post.data.coverImages);
       }
     }
   }, [post]);
