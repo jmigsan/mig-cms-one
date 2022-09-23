@@ -11,6 +11,7 @@ import superjson from 'superjson';
 import { authOptions as nextAuthOptions } from '../api/auth/[...nextauth]';
 import DOMPurify from 'isomorphic-dompurify';
 import { unstable_getServerSession } from 'next-auth/next';
+import Carousel from '../../components/Product/Carousel';
 
 const Post = (
   props: InferGetServerSidePropsType<typeof getServerSideProps>
@@ -36,16 +37,9 @@ const Post = (
             {data?.title}
           </Text>
           <Box>
-            {data?.coverImages &&
-              data.coverImages.length > 0 &&
-              data.coverImages.map((imageURL) => (
-                <Image
-                  src={imageURL}
-                  rounded={'xl'}
-                  key={imageURL}
-                  maxW={'md'}
-                />
-              ))}
+            {data?.coverImages && data.coverImages.length > 0 && (
+              <Carousel imageArr={data.coverImages} />
+            )}
             <Box
               dangerouslySetInnerHTML={{
                 __html: DOMPurify.sanitize(data?.content!),
