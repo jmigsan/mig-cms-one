@@ -36,7 +36,8 @@ const Post = (
             {data?.title}
           </Text>
           <Box>
-            {data?.coverImages.length > 0 &&
+            {data?.coverImages ? (
+              data?.coverImages.length > 0 &&
               data.coverImages.map((imageURL) => (
                 <Image
                   src={imageURL}
@@ -44,7 +45,10 @@ const Post = (
                   key={imageURL}
                   maxW={'md'}
                 />
-              ))}
+              ))
+            ) : (
+              <></>
+            )}
             <Box
               dangerouslySetInnerHTML={{
                 __html: DOMPurify.sanitize(data?.content!),
